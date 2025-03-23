@@ -17,7 +17,9 @@ export const MainApp = () => {
     descField: "",
   });
 
-  const [mapData, setMapData] = useState<Array<Array<string>>>([]);
+  const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
+    null
+  );
 
   return (
     <div className="w-full p-6">
@@ -30,6 +32,8 @@ export const MainApp = () => {
         <div className=" ">
           <MapView mapData={mapData} />
         </div>
+
+        {JSON.stringify(mapFields)}
       </div>
     </div>
   );

@@ -4,10 +4,10 @@ import { MapFields } from "../../App";
 
 type CSVBoxProps = {
   setMapFields: (fields: MapFields) => void;
-  setMapData: (data: Array<Array<string>>) => void;
+  setMapData: (data: GeoJSON.FeatureCollection) => void;
 };
 
-export const CSVBox = ({ setMapFields }: CSVBoxProps) => {
+export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
   const [csvUrl, setCsvUrl] = useState<string>(
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv"
   );
@@ -107,6 +107,37 @@ export const CSVBox = ({ setMapFields }: CSVBoxProps) => {
       if (possibleNameFields.length > 0) setNameField(possibleNameFields[0]);
     }
   }, [headers]);
+
+  const handleApplyClick = () => {
+    // Apply field selection
+    // Pass selected fields to parent component
+    setMapFields({ latField, lngField, nameField, descField });
+
+    //convert csvData to geojson
+    const geojson = {
+      type: "FeatureCollection",
+      features: csvData.map((row) => {
+        const lat = parseFloat(row[headers.indexOf(latField)]);
+        const lng = parseFloat(row[headers.indexOf(lngField)]);
+        const name = nameField ? row[headers.indexOf(nameField)] : "";
+        const desc = descField ? row[headers.indexOf(descField)] : "";
+
+        return {
+          type: "Feature",
+          properties: {
+            name,
+            description: desc,
+          },
+          geometry: {
+            type: "Point",
+            coordinates: [lng, lat],
+          },
+        };
+      }),
+    };
+
+    setMapData(geojson as GeoJSON.FeatureCollection);
+  };
 
   const renderFieldSelector = (
     label: string,
@@ -224,6 +255,7 @@ export const CSVBox = ({ setMapFields }: CSVBoxProps) => {
             <button
               className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
               disabled={!latField || !lngField}
+              onClick={handleApplyClick}
             >
               Apply Field Selection
             </button>
