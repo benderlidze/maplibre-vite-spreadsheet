@@ -10,6 +10,12 @@ export const CSVBox = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Field selection state
+  const [latField, setLatField] = useState<string>("");
+  const [lngField, setLngField] = useState<string>("");
+  const [nameField, setNameField] = useState<string>("");
+  const [descField, setDescField] = useState<string>("");
+
   const fetchCSVData = async () => {
     if (!csvUrl) return;
 
@@ -73,8 +79,57 @@ export const CSVBox = () => {
     }
   }, [csvUrl]);
 
+  // Auto-select fields that might contain lat/lng data
+  useEffect(() => {
+    if (headers.length > 0) {
+      // Try to auto-detect lat/lng fields
+      const possibleLatFields = headers.filter(
+        (h) => /lat/i.test(h) || /latitude/i.test(h)
+      );
+      const possibleLngFields = headers.filter(
+        (h) => /lon/i.test(h) || /lng/i.test(h) || /longitude/i.test(h)
+      );
+
+      if (possibleLatFields.length > 0) setLatField(possibleLatFields[0]);
+      if (possibleLngFields.length > 0) setLngField(possibleLngFields[0]);
+
+      // Look for name or title fields
+      const possibleNameFields = headers.filter(
+        (h) => /name/i.test(h) || /title/i.test(h)
+      );
+
+      if (possibleNameFields.length > 0) setNameField(possibleNameFields[0]);
+    }
+  }, [headers]);
+
+  const renderFieldSelector = (
+    label: string,
+    value: string,
+    setter: (value: string) => void,
+    required: boolean = false
+  ) => (
+    <div className="flex flex-col">
+      <label className="mb-1 text-sm font-medium text-gray-700">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <select
+        value={value}
+        onChange={(e) => setter(e.target.value)}
+        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required={required}
+      >
+        <option value="">Select field</option>
+        {headers.map((header, index) => (
+          <option key={index} value={header}>
+            {header}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
   return (
-    <div className="space-y-4 ">
+    <div className="space-y-4">
       <div className="flex items-center gap-2">
         <input
           type="text"
@@ -143,6 +198,30 @@ export const CSVBox = () => {
           {isLoading
             ? "Loading CSV data..."
             : "Enter a CSV URL to display data"}
+        </div>
+      )}
+
+      {headers.length > 0 && (
+        <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+          <h3 className="text-lg font-medium mb-3">Map Field Selection</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {renderFieldSelector("Latitude", latField, setLatField, true)}
+            {renderFieldSelector("Longitude", lngField, setLngField, true)}
+            {renderFieldSelector("Name (optional)", nameField, setNameField)}
+            {renderFieldSelector(
+              "Description (optional)",
+              descField,
+              setDescField
+            )}
+          </div>
+          <div className="mt-4">
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+              disabled={!latField || !lngField}
+            >
+              Apply Field Selection
+            </button>
+          </div>
         </div>
       )}
     </div>
