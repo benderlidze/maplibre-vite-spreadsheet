@@ -3,11 +3,16 @@ import Papa from "papaparse";
 import { MapFields } from "../../App";
 
 type CSVBoxProps = {
+  setCSVUrl: (url: string) => void;
   setMapFields: (fields: MapFields) => void;
   setMapData: (data: GeoJSON.FeatureCollection) => void;
 };
 
-export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
+export const CSVBox = ({
+  setMapFields,
+  setMapData,
+  setCSVUrl,
+}: CSVBoxProps) => {
   const [csvUrl, setCsvUrl] = useState<string>(
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv"
   );
@@ -112,6 +117,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
     // Apply field selection
     // Pass selected fields to parent component
     setMapFields({ latField, lngField, nameField, descField });
+    setCSVUrl(csvUrl);
 
     //convert csvData to geojson
     const geojson = {

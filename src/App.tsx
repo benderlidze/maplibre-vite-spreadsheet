@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CSVBox } from "./components/CSVBox";
 import { MapView } from "./components/MapView";
+import { CodeGenerator } from "./components/CodeGenerator";
 
 export type MapFields = {
   latField: string;
@@ -10,13 +11,13 @@ export type MapFields = {
 };
 
 export const MainApp = () => {
+  const [CSVUrl, setCSVUrl] = useState<string>("");
   const [mapFields, setMapFields] = useState<MapFields>({
     latField: "",
     lngField: "",
     nameField: "",
     descField: "",
   });
-
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
     null
   );
@@ -27,12 +28,14 @@ export const MainApp = () => {
         https://docs.google.com/spreadsheets/d/1GkiV0OF9ifo512SYUzbBzjMXnc1eI8puAdEBkdfYKxs
         <div className="bg-white rounded-lg w-full ">
           <h2 className="text-xl font-bold ">Google Spreadsheet Viewer</h2>
-          <CSVBox setMapFields={setMapFields} setMapData={setMapData} />
+          <CSVBox
+            setCSVUrl={setCSVUrl}
+            setMapFields={setMapFields}
+            setMapData={setMapData}
+          />
         </div>
-        <div className=" ">
-          <MapView mapData={mapData} />
-        </div>
-        {JSON.stringify(mapFields)}
+        <MapView mapData={mapData} />
+        <CodeGenerator mapFields={mapFields} CSVUrl={CSVUrl} />
       </div>
     </div>
   );
