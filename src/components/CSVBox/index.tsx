@@ -60,7 +60,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
           const parsedData = results.data as Array<Array<string>>;
           if (parsedData.length > 0) {
             setHeaders(parsedData[0]);
-            setCsvData(parsedData.slice(1, 5)); // First 10 rows of data after header
+            setCsvData(parsedData); // First 10 rows of data after header
           }
           setIsLoading(false);
         },
@@ -116,24 +116,26 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
     //convert csvData to geojson
     const geojson = {
       type: "FeatureCollection",
-      features: csvData.map((row) => {
-        const lat = parseFloat(row[headers.indexOf(latField)]);
-        const lng = parseFloat(row[headers.indexOf(lngField)]);
-        const name = nameField ? row[headers.indexOf(nameField)] : "";
-        const desc = descField ? row[headers.indexOf(descField)] : "";
+      features: csvData
+        .slice(1) // Skip header row
+        .map((row) => {
+          const lat = parseFloat(row[headers.indexOf(latField)]);
+          const lng = parseFloat(row[headers.indexOf(lngField)]);
+          const name = nameField ? row[headers.indexOf(nameField)] : "";
+          const desc = descField ? row[headers.indexOf(descField)] : "";
 
-        return {
-          type: "Feature",
-          properties: {
-            name,
-            description: desc,
-          },
-          geometry: {
-            type: "Point",
-            coordinates: [lng, lat],
-          },
-        };
-      }),
+          return {
+            type: "Feature",
+            properties: {
+              name,
+              description: desc,
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [lng, lat],
+            },
+          };
+        }),
     };
 
     setMapData(geojson as GeoJSON.FeatureCollection);
@@ -204,7 +206,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {csvData.map((row, rowIndex) => (
+                {csvData.slice(0, 5).map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
                     className={

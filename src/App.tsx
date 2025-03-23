@@ -24,15 +24,14 @@ export const MainApp = () => {
   return (
     <div className="w-full p-6">
       <div className="flex flex-col gap-5 ">
+        https://docs.google.com/spreadsheets/d/1GkiV0OF9ifo512SYUzbBzjMXnc1eI8puAdEBkdfYKxs
         <div className="bg-white rounded-lg w-full ">
           <h2 className="text-xl font-bold ">Google Spreadsheet Viewer</h2>
           <CSVBox setMapFields={setMapFields} setMapData={setMapData} />
         </div>
-
         <div className=" ">
           <MapView mapData={mapData} />
         </div>
-
         {JSON.stringify(mapFields)}
       </div>
     </div>

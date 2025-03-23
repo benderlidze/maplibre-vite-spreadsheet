@@ -7,6 +7,8 @@ type MapViewProps = {
 };
 
 export const MapView = ({ mapData }: MapViewProps) => {
+  console.log("mapData", mapData);
+
   return (
     <Map
       initialViewState={{
