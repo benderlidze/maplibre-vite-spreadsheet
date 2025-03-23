@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import Papa from "papaparse";
+import { MapFields } from "../../App";
 
-export const CSVBox = () => {
+type CSVBoxProps = {
+  setMapFields: (fields: MapFields) => void;
+  setMapData: (data: Array<Array<string>>) => void;
+};
+
+export const CSVBox = ({ setMapFields }: CSVBoxProps) => {
   const [csvUrl, setCsvUrl] = useState<string>(
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv"
   );
