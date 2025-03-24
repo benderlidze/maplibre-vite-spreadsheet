@@ -1,7 +1,12 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { CSVBox } from "./components/CSVBox";
-import { MapView } from "./components/MapView";
-import { CodeGenerator } from "./components/CodeGenerator";
+import { CodeGenerator } from "../components/CodeGenerator";
+import { CSVBox } from "../components/CSVBox";
+import { MapView } from "../components/MapView";
+
+export const Route = createFileRoute("/")({
+  component: Index,
+});
 
 export type MapFields = {
   latField: string;
@@ -10,7 +15,7 @@ export type MapFields = {
   descField: string;
 };
 
-export const MainApp = () => {
+function Index() {
   const [CSVUrl, setCSVUrl] = useState<string>("");
   const [mapFields, setMapFields] = useState<MapFields>({
     latField: "",
@@ -39,4 +44,4 @@ export const MainApp = () => {
       </div>
     </div>
   );
-};
+}
