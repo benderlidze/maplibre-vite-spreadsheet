@@ -1,18 +1,38 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useRouterState,
+} from "@tanstack/react-router";
 
-export const Route = createRootRoute({
-  component: () => (
+// Root component (now a valid React component)
+const RootComponent = () => {
+  const { location } = useRouterState();
+  const hideMenu = location.pathname.startsWith("/map");
+
+  return (
     <>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Create a map
-        </Link>{" "}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
-      </div>
-      <hr />
+      {!hideMenu && (
+        <>
+          <nav className="p-2 flex gap-2">
+            <Link to="/" className="[&.active]:font-bold">
+              Create a map
+            </Link>
+            <Link to="/map" className="[&.active]:font-bold">
+              Map
+            </Link>
+            <Link to="/about" className="[&.active]:font-bold">
+              About
+            </Link>
+          </nav>
+          <hr />
+        </>
+      )}
       <Outlet />
     </>
-  ),
+  );
+};
+
+export const Route = createRootRoute({
+  component: RootComponent,
 });
