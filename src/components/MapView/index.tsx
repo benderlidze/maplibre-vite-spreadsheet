@@ -2,23 +2,15 @@
 import { useState } from "react";
 import Map, { Layer, Source } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { MAP_STYLES } from "../../contants";
 
 type MapViewProps = {
   mapData: GeoJSON.FeatureCollection | null;
 };
 
-const MAP_STYLES = {
-  Dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-  Light: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-  Voyager: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
-  Contrast: "https://demotiles.maplibre.org/style.json",
-};
-
 export const MapView = ({ mapData }: MapViewProps) => {
   const [currentStyle, setCurrentStyle] =
     useState<keyof typeof MAP_STYLES>("Dark");
-
-  console.log("mapData", mapData);
 
   return (
     <div>

@@ -9,6 +9,7 @@ export const Route = createFileRoute("/")({
 });
 
 export type MapFields = {
+  dataURL: string;
   latField: string;
   lngField: string;
   nameField: string;
@@ -16,8 +17,8 @@ export type MapFields = {
 };
 
 function Index() {
-  const [CSVUrl, setCSVUrl] = useState<string>("");
   const [mapFields, setMapFields] = useState<MapFields>({
+    dataURL: "",
     latField: "",
     lngField: "",
     nameField: "",
@@ -33,14 +34,10 @@ function Index() {
         https://docs.google.com/spreadsheets/d/1GkiV0OF9ifo512SYUzbBzjMXnc1eI8puAdEBkdfYKxs
         <div className="bg-white rounded-lg w-full ">
           <h2 className="text-xl font-bold ">Google Spreadsheet Viewer</h2>
-          <CSVBox
-            setCSVUrl={setCSVUrl}
-            setMapFields={setMapFields}
-            setMapData={setMapData}
-          />
+          <CSVBox setMapFields={setMapFields} setMapData={setMapData} />
         </div>
         <MapView mapData={mapData} />
-        <CodeGenerator mapFields={mapFields} CSVUrl={CSVUrl} />
+        <CodeGenerator mapFields={mapFields} />
       </div>
     </div>
   );

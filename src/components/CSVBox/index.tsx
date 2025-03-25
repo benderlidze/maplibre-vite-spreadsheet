@@ -1,18 +1,13 @@
 import { useState, useEffect } from "react";
-import Papa from "papaparse";
-import { MapFields } from "../../App";
+import { MapFields } from "../../routes";
+import { fetchCSVData } from "../../helpers/csvParse";
 
 type CSVBoxProps = {
-  setCSVUrl: (url: string) => void;
   setMapFields: (fields: MapFields) => void;
   setMapData: (data: GeoJSON.FeatureCollection) => void;
 };
 
-export const CSVBox = ({
-  setMapFields,
-  setMapData,
-  setCSVUrl,
-}: CSVBoxProps) => {
+export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
   const [csvUrl, setCsvUrl] = useState<string>(
     "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv"
   );
@@ -27,66 +22,15 @@ export const CSVBox = ({
   const [nameField, setNameField] = useState<string>("");
   const [descField, setDescField] = useState<string>("");
 
-  const fetchCSVData = async () => {
-    if (!csvUrl) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(csvUrl);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch CSV: ${response.status}`);
-      }
-
-      const csvText = await response.text();
-
-      interface PapaParseResult {
-        data: Array<Array<string>>;
-        errors: Array<{ message: string }>;
-        meta: {
-          delimiter: string;
-          linebreak: string;
-          aborted: boolean;
-          truncated: boolean;
-          cursor: number;
-        };
-      }
-
-      interface PapaParseError {
-        message: string;
-        code?: string;
-        row?: number;
-      }
-
-      Papa.parse(csvText, {
-        complete: (results: PapaParseResult) => {
-          const parsedData = results.data as Array<Array<string>>;
-          if (parsedData.length > 0) {
-            setHeaders(parsedData[0]);
-            setCsvData(parsedData); // First 10 rows of data after header
-          }
-          setIsLoading(false);
-        },
-        error: (error: PapaParseError) => {
-          setError(`Error parsing CSV: ${error.message}`);
-          setIsLoading(false);
-        },
-      });
-    } catch (err) {
-      setError(
-        `Error fetching CSV: ${
-          err instanceof Error ? err.message : String(err)
-        }`
-      );
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (csvUrl) {
-      fetchCSVData();
+      fetchCSVData({
+        url: csvUrl,
+        setIsLoading,
+        setError,
+        setHeaders,
+        setCsvData,
+      });
     }
   }, [csvUrl]);
 
@@ -116,8 +60,13 @@ export const CSVBox = ({
   const handleApplyClick = () => {
     // Apply field selection
     // Pass selected fields to parent component
-    setMapFields({ latField, lngField, nameField, descField });
-    setCSVUrl(csvUrl);
+    setMapFields({
+      dataURL: csvUrl,
+      latField,
+      lngField,
+      nameField,
+      descField,
+    });
 
     //convert csvData to geojson
     const geojson = {
@@ -184,7 +133,15 @@ export const CSVBox = ({
           className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
-          onClick={fetchCSVData}
+          onClick={() =>
+            fetchCSVData({
+              url: csvUrl,
+              setIsLoading,
+              setError,
+              setHeaders,
+              setCsvData,
+            })
+          }
           className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={isLoading || !csvUrl}
         >
