@@ -8,7 +8,6 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
   const params = new URLSearchParams();
   params.append("mapFields", encodeURIComponent(JSON.stringify(mapFields)));
   const iframeCode = `<iframe 
-  ${new Date().toLocaleString()} 
     src="${window.location.origin}/?${params}" 
     width="100%" 
     height="500px" 
