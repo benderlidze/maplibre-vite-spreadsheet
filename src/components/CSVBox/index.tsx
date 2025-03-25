@@ -169,7 +169,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {csvData.slice(0, 5).map((row, rowIndex) => (
+                {csvData.slice(1, 3).map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
                     className={
