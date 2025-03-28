@@ -25,6 +25,9 @@ const RootComponent = () => {
             <Link to="/about" className="[&.active]:font-bold">
               About
             </Link>
+            <Link to="/geocoder" className="[&.active]:font-bold">
+              Geocode
+            </Link>
           </nav>
           <hr />
         </>
