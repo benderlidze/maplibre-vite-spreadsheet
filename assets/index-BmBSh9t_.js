@@ -1,4 +1,4 @@
-import{j as e,r as i}from"./index-B-8Boq0e.js";import{f as V,a as k,M as R,S as U,L as O}from"./csvParse-BdONWmGz.js";const H=({mapFields:c})=>{const r=new URLSearchParams;r.append("mapFields",encodeURIComponent(JSON.stringify(c)));const t=`<iframe 
+import{j as e,r as i}from"./index-B3yw2pLG.js";import{f as V,a as k,M as R,S as U,L as O}from"./csvParse-CpCrrykK.js";const H=({mapFields:c})=>{const r=new URLSearchParams;r.append("mapFields",encodeURIComponent(JSON.stringify(c)));const t=`<iframe 
     src="${window.location.origin}/map?${r}" 
     width="100%" 
     height="500px" 
