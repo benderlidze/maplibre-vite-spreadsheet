@@ -4,6 +4,7 @@ import {
   Outlet,
   useRouterState,
 } from "@tanstack/react-router";
+import { NotFound } from "../components/NotFound";
 
 // Root component (now a valid React component)
 const RootComponent = () => {
@@ -35,4 +36,5 @@ const RootComponent = () => {
 
 export const Route = createRootRoute({
   component: RootComponent,
+  notFoundComponent: NotFound,
 });
