@@ -176,6 +176,14 @@ export const IframeMap = () => {
         mapStyle={mapStyle}
         interactiveLayerIds={mapData ? ["points"] : []}
         onClick={onClick}
+        onMouseEnter={(e) => {
+          if (e.features?.[0]?.layer.id === "points") {
+            e.target.getCanvas().style.cursor = "pointer";
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.target.getCanvas().style.cursor = "";
+        }}
         attributionControl={{
           customAttribution:
             "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
