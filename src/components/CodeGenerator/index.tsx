@@ -17,7 +17,7 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
   return (
     <div>
       <div>
-        <h2>Embed Code </h2>
+        <h3 className="text-lg font-medium mb-3">4. Your map iframe code </h3>
         <textarea className="border w-full" value={iframeCode} readOnly />
       </div>
     </div>

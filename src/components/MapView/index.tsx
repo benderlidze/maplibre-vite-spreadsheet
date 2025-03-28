@@ -14,22 +14,26 @@ export const MapView = ({ mapData }: MapViewProps) => {
 
   return (
     <div>
-      <div style={{ marginBottom: "10px" }}>
-        <label htmlFor="map-style-select">Map style: </label>
-        <select
-          id="map-style-select"
-          value={currentStyle}
-          onChange={(e) =>
-            setCurrentStyle(e.target.value as keyof typeof MAP_STYLES)
-          }
-        >
-          {Object.keys(MAP_STYLES).map((style) => (
-            <option key={style} value={style}>
-              {style}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-row justify-between items-center">
+        <h3 className="text-lg font-medium mb-3">3. Map Preview </h3>
+        <div style={{ marginBottom: "10px" }}>
+          <label htmlFor="map-style-select">Map style: </label>
+          <select
+            id="map-style-select"
+            value={currentStyle}
+            onChange={(e) =>
+              setCurrentStyle(e.target.value as keyof typeof MAP_STYLES)
+            }
+          >
+            {Object.keys(MAP_STYLES).map((style) => (
+              <option key={style} value={style}>
+                {style}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
+
       <Map
         initialViewState={{
           longitude: 0,

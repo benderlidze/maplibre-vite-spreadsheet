@@ -204,28 +204,30 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
       )}
 
       {headers.length > 0 && (
-        <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
-          <h3 className="text-lg font-medium mb-3">Map Field Selection</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {renderFieldSelector("Latitude", latField, setLatField, true)}
-            {renderFieldSelector("Longitude", lngField, setLngField, true)}
-            {renderFieldSelector("Name (optional)", nameField, setNameField)}
-            {renderFieldSelector(
-              "Description (optional)",
-              descField,
-              setDescField
-            )}
+        <>
+          <h3 className="text-lg font-medium mb-3">2. Select Fields </h3>
+          <div className="p-4 border border-gray-300 rounded-lg bg-gray-50">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {renderFieldSelector("Latitude", latField, setLatField, true)}
+              {renderFieldSelector("Longitude", lngField, setLngField, true)}
+              {renderFieldSelector("Name (optional)", nameField, setNameField)}
+              {renderFieldSelector(
+                "Description (optional)",
+                descField,
+                setDescField
+              )}
+            </div>
+            <div className="mt-4">
+              <button
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={!latField || !lngField}
+                onClick={handleApplyClick}
+              >
+                Apply Field Selection
+              </button>
+            </div>
           </div>
-          <div className="mt-4">
-            <button
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-              disabled={!latField || !lngField}
-              onClick={handleApplyClick}
-            >
-              Apply Field Selection
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
