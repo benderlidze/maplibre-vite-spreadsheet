@@ -24,6 +24,7 @@ export const MapView = ({ mapData }: MapViewProps) => {
             onChange={(e) =>
               setCurrentStyle(e.target.value as keyof typeof MAP_STYLES)
             }
+            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {Object.keys(MAP_STYLES).map((style) => (
               <option key={style} value={style}>
