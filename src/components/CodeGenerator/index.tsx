@@ -26,7 +26,7 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
                 navigator.clipboard.writeText(iframeCode);
               }}
             >
-              Copy
+              Copy code
               <svg
                 width="20px"
                 height="20px"
