@@ -6,5 +6,5 @@ export const Route = createFileRoute("/map")({
 });
 
 function RouteComponent() {
-  return <IframeMap mapData={null} />;
+  return <IframeMap />;
 }
