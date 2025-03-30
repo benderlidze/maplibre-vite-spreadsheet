@@ -15,14 +15,21 @@ export type MapFields = {
   lngField: string;
   nameField: string;
   descField: string;
+
   mapStyle: keyof typeof MAP_STYLES;
-  pinColor: string;
+  pinColor?: string;
+  mapCenter?: { lat: number; lng: number };
+  mapZoom?: number;
 };
 
 type MapFieldsAction =
   | { type: "SET_DATA_FIELDS"; payload: Partial<Omit<MapFields, "mapStyle">> }
   | { type: "SET_MAP_STYLE"; payload: keyof typeof MAP_STYLES }
-  | { type: "UPDATE_CUSTOM_PROP"; prop: keyof MapFields; value: string };
+  | {
+      type: "UPDATE_CUSTOM_PROP";
+      prop: keyof MapFields;
+      value: string | number | { lat: number; lng: number };
+    };
 
 function mapFieldsReducer(
   state: MapFields,
@@ -55,16 +62,14 @@ function Index() {
     null
   );
 
-  // Functions to pass to other components
-  // const setCurrentStyle = (style: keyof typeof MAP_STYLES) => {
-  //   dispatch({ type: "SET_MAP_STYLE", payload: style });
-  // };
-
   const setDataFields = (fields: Partial<Omit<MapFields, "mapStyle">>) => {
     dispatch({ type: "SET_DATA_FIELDS", payload: fields });
   };
 
-  const updateCustomProp = (prop: keyof MapFields, value: string) => {
+  const updateCustomProp = (
+    prop: keyof MapFields,
+    value: string | number | { lat: number; lng: number }
+  ) => {
     dispatch({ type: "UPDATE_CUSTOM_PROP", prop, value });
   };
 

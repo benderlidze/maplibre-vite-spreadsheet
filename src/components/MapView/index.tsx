@@ -8,7 +8,10 @@ import { MapFields } from "../../routes";
 type MapViewProps = {
   mapData: GeoJSON.FeatureCollection | null;
   mapProps: MapFields;
-  updateCustomProp: (prop: keyof MapFields, value: string) => void;
+  updateCustomProp: (
+    prop: keyof MapFields,
+    value: string | number | { lat: number; lng: number }
+  ) => void;
 };
 
 export const MapView = ({
@@ -16,11 +19,19 @@ export const MapView = ({
   mapProps,
   updateCustomProp,
 }: MapViewProps) => {
+  console.log("mapProps.mapCenter?.lat", mapProps);
+
+  const { lat, lng } = mapProps.mapCenter || { lat: 0, lng: 0 };
+  const zoom = mapProps.mapZoom || 1;
   return (
     <div>
       <div className="flex flex-row justify-between items-center mb-2">
         <h3 className="text-lg font-medium">3. Map Preview </h3>
         <div className="flex flex-row items-center gap-4">
+          <div>
+            Center: {`${lat.toFixed(2)},${lng.toFixed(2)}`} Zoom:{" "}
+            {zoom.toFixed(2)}
+          </div>
           <div>
             <label htmlFor="map-style-select">Map style: </label>
             <select
@@ -41,7 +52,7 @@ export const MapView = ({
           </div>
           <div>
             <ColorPicker
-              value={mapProps.pinColor}
+              value={mapProps.pinColor || "#007cbf"}
               onChange={(value) => updateCustomProp("pinColor", value)}
             />
           </div>
@@ -50,9 +61,18 @@ export const MapView = ({
 
       <Map
         initialViewState={{
-          longitude: 0,
-          latitude: 0,
-          zoom: 1,
+          longitude: mapProps.mapCenter ? lng : 0,
+          latitude: mapProps.mapCenter ? lat : 0,
+          zoom: mapProps.mapZoom || 1,
+        }}
+        onIdle={(e) => {
+          const map = e.target;
+          const center = map.getCenter();
+          const zoom = map.getZoom();
+          console.log("Center:", center, "Zoom:", zoom);
+
+          updateCustomProp("mapZoom", zoom); // Pass zoom as a number
+          updateCustomProp("mapCenter", { lat: center.lat, lng: center.lng }); // Pass center as an object
         }}
         style={{ width: "100%", height: 400 }}
         mapStyle={MAP_STYLES[mapProps.mapStyle]}

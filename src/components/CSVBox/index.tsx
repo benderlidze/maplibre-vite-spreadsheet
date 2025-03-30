@@ -108,7 +108,10 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
       </label>
       <select
         value={value}
-        onChange={(e) => setter(e.target.value)}
+        onChange={(e) => {
+          setter(e.target.value);
+          
+        }}
         className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         required={required}
       >
