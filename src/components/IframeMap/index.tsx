@@ -9,7 +9,8 @@ import Map, {
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MAP_STYLES } from "../../contants";
 import { MapFields } from "../../routes";
-import { fetchCSVData } from "../../helpers/csvParse";
+import { csv } from "d3-fetch";
+import { DSVRowArray } from "d3";
 
 export const IframeMap = () => {
   // State management
@@ -18,7 +19,6 @@ export const IframeMap = () => {
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [mapFields, setMapFields] = useState<MapFields | null>(null);
   const [popupInfo, setPopupInfo] = useState<{
     longitude: number;
     latitude: number;
@@ -35,99 +35,86 @@ export const IframeMap = () => {
 
   // Parse map fields from URL parameters
   useEffect(() => {
-    try {
-      const mapFieldsParam = queryParams.get("mapFields");
-      if (!mapFieldsParam) {
-        setError("No mapFields parameter found in URL");
+    const parseData = async () => {
+      try {
+        const mapFieldsParam = queryParams.get("mapFields");
+        if (!mapFieldsParam) {
+          setError("No mapFields parameter found in URL");
+          setIsLoading(false);
+          return;
+        }
+
+        const decodedFields = decodeURIComponent(mapFieldsParam);
+        const parsedFields = JSON.parse(decodedFields) as MapFields;
+        console.log("parsedFields", parsedFields);
+
+        if (parsedFields.dataURL && parsedFields.dataURL.length > 10) {
+          const csvData = await csv(parsedFields.dataURL);
+          console.log("csvData", csvData);
+          generateGeoJSON({
+            data: csvData,
+            latField: parsedFields.latField,
+            lngField: parsedFields.lngField,
+            nameField: parsedFields.nameField,
+            descField: parsedFields.descField,
+          } as GenerateGeoJSON);
+        }
+      } catch (err) {
+        console.error("Failed to parse mapFields parameter:", err);
+        setError("Invalid mapFields parameter in URL");
         setIsLoading(false);
-        return;
       }
-
-      const decodedFields = decodeURIComponent(mapFieldsParam);
-      const parsedFields = JSON.parse(decodedFields) as MapFields;
-      setMapFields(parsedFields);
-    } catch (err) {
-      console.error("Failed to parse mapFields parameter:", err);
-      setError("Invalid mapFields parameter in URL");
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Fetch CSV data when mapFields are available
-  useEffect(() => {
-    if (!mapFields?.dataURL) return;
-
-    const processCSVData = (headers: string[], data: string[][]) => {
-      // Convert CSV data to GeoJSON
-      const features: GeoJSON.Feature[] = data
-        .filter((row) => row.length >= 2) // Ensure row has enough data
-        .map((row, index) => {
-          // Find column indices
-          const latIndex = headers.indexOf(mapFields.latField);
-          const lngIndex = headers.indexOf(mapFields.lngField);
-          const nameIndex = headers.indexOf(mapFields.nameField);
-          const descIndex = headers.indexOf(mapFields.descField);
-
-          // Skip if required fields are not found
-          if (latIndex < 0 || lngIndex < 0) return null;
-
-          const lat = parseFloat(row[latIndex]);
-          const lng = parseFloat(row[lngIndex]);
-
-          // Skip if lat/lng are not valid numbers
-          if (isNaN(lat) || isNaN(lng)) return null;
-
-          return {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [lng, lat],
-            },
-            properties: {
-              id: index,
-              name: nameIndex >= 0 ? row[nameIndex] : "Unnamed",
-              description: descIndex >= 0 ? row[descIndex] : "",
-              // Include all properties for reference
-              ...headers.reduce(
-                (acc, header, i) => {
-                  acc[header] = row[i];
-                  return acc;
-                },
-                {} as Record<string, string>
-              ),
-            },
-          } as GeoJSON.Feature;
-        })
-        .filter(Boolean) as GeoJSON.Feature[];
-
-      setMapData({
-        type: "FeatureCollection",
-        features,
-      });
-      setIsLoading(false);
     };
 
-    fetchCSVData({
-      url: mapFields.dataURL,
-      setIsLoading,
-      setError,
-      setHeaders: (headers) => {
-        // Store headers for CSV processing
-        const data = sessionStorage.getItem("csvData");
-        if (data) {
-          processCSVData(headers, JSON.parse(data));
-        }
-      },
-      setCsvData: (data) => {
-        // Store CSV data for processing
-        sessionStorage.setItem("csvData", JSON.stringify(data));
-        const headers = sessionStorage.getItem("headers");
-        if (headers) {
-          processCSVData(JSON.parse(headers), data);
-        }
-      },
+    parseData();
+  }, []);
+
+  type GenerateGeoJSON = {
+    data: DSVRowArray<string>;
+    latField: string;
+    lngField: string;
+    nameField?: string;
+    descField?: string;
+  };
+  const generateGeoJSON = ({
+    data,
+    latField,
+    lngField,
+    nameField,
+    descField,
+  }: GenerateGeoJSON) => {
+    const features = data.map((row) => {
+      const latitude = parseFloat(row[latField]);
+      const longitude = parseFloat(row[lngField]);
+
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return null;
+      }
+
+      return {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+        properties: {
+          name: nameField ? row[nameField] : "",
+          description: descField ? row[descField] : "",
+        },
+      };
     });
-  }, [mapFields]);
+
+    const filteredFeatures = features.filter(
+      (f) => f !== null
+    ) as GeoJSON.Feature[];
+    const featureCollection: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features: filteredFeatures,
+    };
+
+    setMapData(featureCollection);
+    setIsLoading(false);
+  };
 
   // Handle clicking on a map feature
   const onClick = useCallback((event: MapLayerMouseEvent) => {
@@ -186,7 +173,7 @@ export const IframeMap = () => {
         }}
         attributionControl={{
           customAttribution:
-            "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+            "© <a href='https://3x3.zone'>3x3.zone</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
         }}
       >
         <NavigationControl position="top-right" />
