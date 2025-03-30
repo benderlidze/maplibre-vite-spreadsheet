@@ -23,7 +23,7 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
           <h3 className="text-lg font-medium mb-3">4. Your map iframe code </h3>
           <div className="flex flex-row">
             <button
-              className="flex items-center gap-1 px-2 py-1 text-sm hover:font-bold cursor-pointer"
+              className="flex items-center gap-1 px-2 py-1 text-sm hover:text-blue-800 cursor-pointer"
               onClick={() => {
                 navigator.clipboard.writeText(iframeCode);
               }}
