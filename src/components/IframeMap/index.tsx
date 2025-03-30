@@ -32,11 +32,13 @@ export const IframeMap = () => {
   const decodedFields = decodeURIComponent(mapFieldsParam);
   const parsedFields = JSON.parse(decodedFields) as MapFields;
   const mapStyle = MAP_STYLES[parsedFields.mapStyle] || MAP_STYLES.Light;
-  
+  const pinColor = parsedFields.pinColor ?? "#007cbf";
+
   console.log("parsedFields", parsedFields);
   // Parse map fields from URL parameters
   useEffect(() => {
     const parseData = async () => {
+      console.log("123", 123);
       try {
         if (parsedFields.dataURL && parsedFields.dataURL.length > 10) {
           const csvData = await csv(parsedFields.dataURL);
@@ -132,7 +134,7 @@ export const IframeMap = () => {
               source="points-source"
               paint={{
                 "circle-radius": 6,
-                "circle-color": "#3b82f6",
+                "circle-color": pinColor,
                 "circle-stroke-width": 2,
                 "circle-stroke-color": "#ffffff",
                 "circle-opacity": 0.9,

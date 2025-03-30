@@ -19,15 +19,13 @@ const RootComponent = () => {
             <Link to="/" className="[&.active]:font-bold">
               Create a map
             </Link>
-            <Link to="/map" className="[&.active]:font-bold">
-              Map
-            </Link>
+
             <Link to="/about" className="[&.active]:font-bold">
               About
             </Link>
-            <Link to="/geocoder" className="[&.active]:font-bold">
+            {/* <Link to="/geocoder" className="[&.active]:font-bold">
               Geocode
-            </Link>
+            </Link> */}
           </nav>
           <hr />
         </>

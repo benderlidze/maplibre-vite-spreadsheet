@@ -16,11 +16,13 @@ export type MapFields = {
   nameField: string;
   descField: string;
   mapStyle: keyof typeof MAP_STYLES;
+  pinColor: string;
 };
 
 type MapFieldsAction =
   | { type: "SET_DATA_FIELDS"; payload: Partial<Omit<MapFields, "mapStyle">> }
-  | { type: "SET_MAP_STYLE"; payload: keyof typeof MAP_STYLES };
+  | { type: "SET_MAP_STYLE"; payload: keyof typeof MAP_STYLES }
+  | { type: "UPDATE_CUSTOM_PROP"; prop: keyof MapFields; value: string };
 
 function mapFieldsReducer(
   state: MapFields,
@@ -31,19 +33,22 @@ function mapFieldsReducer(
       return { ...state, ...action.payload };
     case "SET_MAP_STYLE":
       return { ...state, mapStyle: action.payload };
+    case "UPDATE_CUSTOM_PROP":
+      return { ...state, [action.prop]: action.value };
     default:
       return state;
   }
 }
 
 function Index() {
-  const [mapFields, dispatch] = useReducer(mapFieldsReducer, {
+  const [mapProps, dispatch] = useReducer(mapFieldsReducer, {
     dataURL: "",
     latField: "",
     lngField: "",
     nameField: "",
     descField: "",
     mapStyle: "Light",
+    pinColor: "#007cbf",
   });
 
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
@@ -51,12 +56,16 @@ function Index() {
   );
 
   // Functions to pass to other components
-  const setCurrentStyle = (style: keyof typeof MAP_STYLES) => {
-    dispatch({ type: "SET_MAP_STYLE", payload: style });
-  };
+  // const setCurrentStyle = (style: keyof typeof MAP_STYLES) => {
+  //   dispatch({ type: "SET_MAP_STYLE", payload: style });
+  // };
 
   const setDataFields = (fields: Partial<Omit<MapFields, "mapStyle">>) => {
     dispatch({ type: "SET_DATA_FIELDS", payload: fields });
+  };
+
+  const updateCustomProp = (prop: keyof MapFields, value: string) => {
+    dispatch({ type: "UPDATE_CUSTOM_PROP", prop, value });
   };
 
   return (
@@ -71,10 +80,10 @@ function Index() {
         </div>
         <MapView
           mapData={mapData}
-          currentStyle={mapFields.mapStyle}
-          setCurrentStyle={setCurrentStyle}
+          mapProps={mapProps}
+          updateCustomProp={updateCustomProp}
         />
-        <CodeGenerator mapFields={mapFields} />
+        <CodeGenerator mapFields={mapProps} />
       </div>
     </div>
   );
