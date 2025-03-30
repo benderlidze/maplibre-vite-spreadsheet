@@ -28,26 +28,16 @@ export const IframeMap = () => {
 
   // Get map style from URL parameters
   const queryParams = new URLSearchParams(window.location.search);
-  const mapStyleParam = queryParams.get("style") ?? "Light";
-  const mapStyle = MAP_STYLES[
-    mapStyleParam as keyof typeof MAP_STYLES
-  ] as string;
-
+  const mapFieldsParam = queryParams.get("mapFields") ?? "";
+  const decodedFields = decodeURIComponent(mapFieldsParam);
+  const parsedFields = JSON.parse(decodedFields) as MapFields;
+  const mapStyle = MAP_STYLES[parsedFields.mapStyle] || MAP_STYLES.Light;
+  
+  console.log("parsedFields", parsedFields);
   // Parse map fields from URL parameters
   useEffect(() => {
     const parseData = async () => {
       try {
-        const mapFieldsParam = queryParams.get("mapFields");
-        if (!mapFieldsParam) {
-          setError("No mapFields parameter found in URL");
-          setIsLoading(false);
-          return;
-        }
-
-        const decodedFields = decodeURIComponent(mapFieldsParam);
-        const parsedFields = JSON.parse(decodedFields) as MapFields;
-        console.log("parsedFields", parsedFields);
-
         if (parsedFields.dataURL && parsedFields.dataURL.length > 10) {
           const csvData = await csv(parsedFields.dataURL);
           console.log("csvData", csvData);
