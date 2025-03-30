@@ -71,8 +71,10 @@ export const MapView = ({
           const zoom = map.getZoom();
           console.log("Center:", center, "Zoom:", zoom);
 
-          updateCustomProp("mapZoom", zoom); // Pass zoom as a number
-          updateCustomProp("mapCenter", { lat: center.lat, lng: center.lng }); // Pass center as an object
+          updateCustomProp("mapZoom", zoom);
+          updateCustomProp("mapCenter", { lat: center.lat, lng: center.lng });
+          updateCustomProp("mapPitch", map.getPitch());
+          updateCustomProp("mapBearing", map.getBearing());
         }}
         style={{ width: "100%", height: 400 }}
         mapStyle={MAP_STYLES[mapProps.mapStyle]}

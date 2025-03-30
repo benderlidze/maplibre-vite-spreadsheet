@@ -20,6 +20,8 @@ export type MapFields = {
   pinColor?: string;
   mapCenter?: { lat: number; lng: number };
   mapZoom?: number;
+  mapPitch?: number;
+  mapBearing?: number;
 };
 
 type MapFieldsAction =

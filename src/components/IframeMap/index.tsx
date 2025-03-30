@@ -34,6 +34,11 @@ export const IframeMap = () => {
   const mapStyle = MAP_STYLES[parsedFields.mapStyle] || MAP_STYLES.Light;
   const pinColor = parsedFields.pinColor ?? "#007cbf";
 
+  const mapCenter = parsedFields.mapCenter || { lat: 0, lng: 0 };
+  const mapZoom = parsedFields.mapZoom || 1;
+  const mapPitch = parsedFields.mapPitch || 0;
+  const mapBearing = parsedFields.mapBearing || 0;
+
   // Parse map fields from URL parameters
   useEffect(() => {
     const parseData = async () => {
@@ -101,9 +106,11 @@ export const IframeMap = () => {
 
       <Map
         initialViewState={{
-          longitude: 0,
-          latitude: 0,
-          zoom: 1,
+          longitude: mapCenter.lng,
+          latitude: mapCenter.lat,
+          zoom: mapZoom,
+          pitch: mapPitch,
+          bearing: mapBearing,
         }}
         style={{ width: "100%", height: "100%" }}
         mapStyle={mapStyle}
