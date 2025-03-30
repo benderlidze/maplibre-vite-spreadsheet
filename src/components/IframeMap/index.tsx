@@ -10,7 +10,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { MAP_STYLES } from "../../contants";
 import { MapFields } from "../../routes";
 import { csv } from "d3-fetch";
-import { DSVRowArray } from "d3";
+import { generateGeoJSON } from "../../helpers/csvParse";
 
 export const IframeMap = () => {
   // State management
@@ -51,13 +51,16 @@ export const IframeMap = () => {
         if (parsedFields.dataURL && parsedFields.dataURL.length > 10) {
           const csvData = await csv(parsedFields.dataURL);
           console.log("csvData", csvData);
-          generateGeoJSON({
+          const featureCollection = generateGeoJSON({
             data: csvData,
             latField: parsedFields.latField,
             lngField: parsedFields.lngField,
             nameField: parsedFields.nameField,
             descField: parsedFields.descField,
-          } as GenerateGeoJSON);
+          });
+
+          setMapData(featureCollection);
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Failed to parse mapFields parameter:", err);
@@ -68,53 +71,6 @@ export const IframeMap = () => {
 
     parseData();
   }, []);
-
-  type GenerateGeoJSON = {
-    data: DSVRowArray<string>;
-    latField: string;
-    lngField: string;
-    nameField?: string;
-    descField?: string;
-  };
-  const generateGeoJSON = ({
-    data,
-    latField,
-    lngField,
-    nameField,
-    descField,
-  }: GenerateGeoJSON) => {
-    const features = data.map((row) => {
-      const latitude = parseFloat(row[latField]);
-      const longitude = parseFloat(row[lngField]);
-
-      if (isNaN(latitude) || isNaN(longitude)) {
-        return null;
-      }
-
-      return {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [longitude, latitude],
-        },
-        properties: {
-          name: nameField ? row[nameField] : "",
-          description: descField ? row[descField] : "",
-        },
-      };
-    });
-
-    const filteredFeatures = features.filter(
-      (f) => f !== null
-    ) as GeoJSON.Feature[];
-    const featureCollection: GeoJSON.FeatureCollection = {
-      type: "FeatureCollection",
-      features: filteredFeatures,
-    };
-
-    setMapData(featureCollection);
-    setIsLoading(false);
-  };
 
   // Handle clicking on a map feature
   const onClick = useCallback((event: MapLayerMouseEvent) => {

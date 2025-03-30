@@ -1,3 +1,4 @@
+import { DSVRowArray } from "d3";
 import Papa from "papaparse";
 
 type FetchCSVDataProps = {
@@ -67,4 +68,50 @@ export const fetchCSVData = async ({
     );
     setIsLoading(false);
   }
+};
+
+type GenerateGeoJSON = {
+  data: DSVRowArray<string>;
+  latField: string;
+  lngField: string;
+  nameField?: string;
+  descField?: string;
+};
+export const generateGeoJSON = ({
+  data,
+  latField,
+  lngField,
+  nameField,
+  descField,
+}: GenerateGeoJSON) => {
+  const features = data.map((row) => {
+    const latitude = parseFloat(row[latField]);
+    const longitude = parseFloat(row[lngField]);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      return null;
+    }
+
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      },
+      properties: {
+        name: nameField ? row[nameField] : "",
+        description: descField ? row[descField] : "",
+      },
+    };
+  });
+
+  const filteredFeatures = features.filter(
+    (f) => f !== null
+  ) as GeoJSON.Feature[];
+  const featureCollection: GeoJSON.FeatureCollection = {
+    type: "FeatureCollection",
+    features: filteredFeatures,
+  };
+
+  return featureCollection;
 };
