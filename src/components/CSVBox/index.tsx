@@ -3,7 +3,7 @@ import { MapFields } from "../../routes";
 import { fetchCSVData } from "../../helpers/csvParse";
 
 type CSVBoxProps = {
-  setMapFields: (fields: MapFields) => void;
+  setMapFields: (fields: Partial<Omit<MapFields, "mapStyle">>) => void;
   setMapData: (data: GeoJSON.FeatureCollection) => void;
 };
 

@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import { CodeGenerator } from "../components/CodeGenerator";
 import { CSVBox } from "../components/CSVBox";
 import { MapView } from "../components/MapView";
+import { MAP_STYLES } from "../contants";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -14,19 +15,49 @@ export type MapFields = {
   lngField: string;
   nameField: string;
   descField: string;
+  mapStyle: keyof typeof MAP_STYLES;
 };
 
+type MapFieldsAction =
+  | { type: "SET_DATA_FIELDS"; payload: Partial<Omit<MapFields, "mapStyle">> }
+  | { type: "SET_MAP_STYLE"; payload: keyof typeof MAP_STYLES };
+
+function mapFieldsReducer(
+  state: MapFields,
+  action: MapFieldsAction
+): MapFields {
+  switch (action.type) {
+    case "SET_DATA_FIELDS":
+      return { ...state, ...action.payload };
+    case "SET_MAP_STYLE":
+      return { ...state, mapStyle: action.payload };
+    default:
+      return state;
+  }
+}
+
 function Index() {
-  const [mapFields, setMapFields] = useState<MapFields>({
+  const [mapFields, dispatch] = useReducer(mapFieldsReducer, {
     dataURL: "",
     latField: "",
     lngField: "",
     nameField: "",
     descField: "",
+    mapStyle: "Light",
   });
+
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
     null
   );
+
+  // Functions to pass to other components
+  const setCurrentStyle = (style: keyof typeof MAP_STYLES) => {
+    dispatch({ type: "SET_MAP_STYLE", payload: style });
+  };
+
+  const setDataFields = (fields: Partial<Omit<MapFields, "mapStyle">>) => {
+    dispatch({ type: "SET_DATA_FIELDS", payload: fields });
+  };
 
   return (
     <div className="w-full p-6">
@@ -36,9 +67,13 @@ function Index() {
           <h3 className="text-lg font-medium mb-3">
             1. Add Google Spreadsheet URL
           </h3>
-          <CSVBox setMapFields={setMapFields} setMapData={setMapData} />
+          <CSVBox setMapFields={setDataFields} setMapData={setMapData} />
         </div>
-        <MapView mapData={mapData} />
+        <MapView
+          mapData={mapData}
+          currentStyle={mapFields.mapStyle}
+          setCurrentStyle={setCurrentStyle}
+        />
         <CodeGenerator mapFields={mapFields} />
       </div>
     </div>

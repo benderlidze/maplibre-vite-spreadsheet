@@ -1,16 +1,21 @@
 // Using Maplibre
-import { useState } from "react";
 import Map, { Layer, Source } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MAP_STYLES } from "../../contants";
 
 type MapViewProps = {
   mapData: GeoJSON.FeatureCollection | null;
+  currentStyle: keyof typeof MAP_STYLES;
+  setCurrentStyle: (style: keyof typeof MAP_STYLES) => void;
 };
 
-export const MapView = ({ mapData }: MapViewProps) => {
-  const [currentStyle, setCurrentStyle] =
-    useState<keyof typeof MAP_STYLES>("Dark");
+export const MapView = ({
+  mapData,
+  currentStyle,
+  setCurrentStyle,
+}: MapViewProps) => {
+
+  console.log('currentStyle',currentStyle);
 
   return (
     <div>
