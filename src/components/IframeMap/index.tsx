@@ -34,11 +34,9 @@ export const IframeMap = () => {
   const mapStyle = MAP_STYLES[parsedFields.mapStyle] || MAP_STYLES.Light;
   const pinColor = parsedFields.pinColor ?? "#007cbf";
 
-  console.log("parsedFields", parsedFields);
   // Parse map fields from URL parameters
   useEffect(() => {
     const parseData = async () => {
-      console.log("123", 123);
       try {
         if (parsedFields.dataURL && parsedFields.dataURL.length > 10) {
           const csvData = await csv(parsedFields.dataURL);
