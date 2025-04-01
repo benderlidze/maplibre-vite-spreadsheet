@@ -1,1 +1,0 @@
-import{j as o}from"./index-D02kCSwA.js";import{I as t}from"./index-Bh31QtVs.js";import"./csvParse-CNvC_X-R.js";const e=function(){return o.jsxs("div",{className:"p-2",children:["Free map ",o.jsx(t,{})]})};export{e as component};
