@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MapFields } from "../../routes";
 import { fetchCSVData } from "../../helpers/csvParse";
 
@@ -57,7 +57,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
     }
   }, [headers]);
 
-  const handleApplyClick = () => {
+  const handleApplyClick = useCallback(() => {
     // Apply field selection
     // Pass selected fields to parent component
     setMapFields({
@@ -94,7 +94,21 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
     };
 
     setMapData(geojson as GeoJSON.FeatureCollection);
-  };
+  }, [
+    csvData,
+    csvUrl,
+    descField,
+    headers,
+    latField,
+    lngField,
+    nameField,
+    setMapData,
+    setMapFields,
+  ]);
+
+  useEffect(() => {
+    handleApplyClick();
+  }, [handleApplyClick, latField, lngField, nameField, descField]);
 
   const renderFieldSelector = (
     label: string,
@@ -110,7 +124,6 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
         value={value}
         onChange={(e) => {
           setter(e.target.value);
-          
         }}
         className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         required={required}
@@ -220,7 +233,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
                 setDescField
               )}
             </div>
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <button
                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
                 disabled={!latField || !lngField}
@@ -228,7 +241,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
               >
                 Apply Field Selection
               </button>
-            </div>
+            </div> */}
           </div>
         </>
       )}
