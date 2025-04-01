@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Map, {
   Layer,
   Source,
@@ -30,7 +30,16 @@ export const IframeMap = () => {
   const queryParams = new URLSearchParams(window.location.search);
   const mapFieldsParam = queryParams.get("mapFields") ?? "";
   const decodedFields = decodeURIComponent(mapFieldsParam);
-  const parsedFields = JSON.parse(decodedFields) as MapFields;
+  
+  const parsedFields = useMemo(() => {
+    try {
+      return JSON.parse(decodedFields) as MapFields;
+    } catch (err) {
+      console.error("Failed to parse mapFields parameter:", err);
+      return {} as MapFields; // Fallback to an empty object or handle appropriately
+    }
+  }, [decodedFields]);
+
   const mapStyle = MAP_STYLES[parsedFields.mapStyle] || MAP_STYLES.Light;
   const pinColor = parsedFields.pinColor ?? "#007cbf";
 
@@ -65,7 +74,7 @@ export const IframeMap = () => {
     };
 
     parseData();
-  }, []);
+  }, [parsedFields]);
 
   // Handle clicking on a map feature
   const onClick = useCallback((event: MapLayerMouseEvent) => {
@@ -126,7 +135,7 @@ export const IframeMap = () => {
         }}
         attributionControl={{
           customAttribution:
-            "© <a href='https://3x3.zone'>3x3.zone</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+            "© <a href='https://geomapi.com/'>geomapi.com</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
         }}
       >
         <NavigationControl position="top-right" />

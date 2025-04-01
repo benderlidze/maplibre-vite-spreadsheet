@@ -108,7 +108,7 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
 
   useEffect(() => {
     handleApplyClick();
-  }, [handleApplyClick, latField, lngField, nameField, descField]);
+  }, [latField, lngField, nameField, descField]);
 
   const renderFieldSelector = (
     label: string,
