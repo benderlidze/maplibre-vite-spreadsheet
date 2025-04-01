@@ -226,9 +226,13 @@ export const CSVBox = ({ setMapFields, setMapData }: CSVBoxProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {renderFieldSelector("Latitude", latField, setLatField, true)}
               {renderFieldSelector("Longitude", lngField, setLngField, true)}
-              {renderFieldSelector("Name (optional)", nameField, setNameField)}
               {renderFieldSelector(
-                "Description (optional)",
+                "Marker Title (optional)",
+                nameField,
+                setNameField
+              )}
+              {renderFieldSelector(
+                "Marker description (optional)",
                 descField,
                 setDescField
               )}
