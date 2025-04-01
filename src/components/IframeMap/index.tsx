@@ -27,10 +27,12 @@ export const IframeMap = () => {
   } | null>(null);
 
   // Get map style from URL parameters
-  const queryParams = new URLSearchParams(window.location.search);
-  const mapFieldsParam = queryParams.get("mapFields") ?? "";
+  const queryParams = new URLSearchParams(
+    window.location.hash.split("?")[1] || ""
+  );
+  const mapFieldsParam = queryParams.get("mapFields") ?? "{}";
   const decodedFields = decodeURIComponent(mapFieldsParam);
-  
+
   const parsedFields = useMemo(() => {
     try {
       return JSON.parse(decodedFields) as MapFields;
