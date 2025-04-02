@@ -1,45 +1,54 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { defaultParams, UrlParams } from "./constants";
 
 export const useUrlParams = (): UrlParams => {
   const [params, setParams] = useState<UrlParams>(defaultParams);
 
-  useEffect(() => {
-    const parseQueryParams = () => {
-      const queryString = window.location.search;
-      const newParams = { ...defaultParams };
+  // Parse URL parameters from hash fragment
+  const parseHashParams = useCallback(() => {
+    // Get the path and query portion from the hash
+    const hashPath = window.location.hash.substring(1); // Remove the # symbol
+    const queryStartIndex = hashPath.indexOf("?");
 
-      if (!queryString) return newParams;
+    if (queryStartIndex === -1) {
+      return defaultParams;
+    }
 
-      const urlParams = new URLSearchParams(queryString);
+    const queryString = hashPath.substring(queryStartIndex + 1);
+    const searchParams = new URLSearchParams(queryString);
+    const parsedParams = { ...defaultParams };
 
-      urlParams.forEach((value, key) => {
-        console.log("value,key", value, key);
+    // Process each parameter
+    searchParams.forEach((value, key) => {
+      console.log("Parsing param:", key, value);
 
-        if (key === "pinColor") {
-          newParams["pinColor"] = value; // Ensure the full value is used
-        } else if (key === "mapCenter") {
-          newParams["mapCenter"] = value.split(",").map(Number) as [
-            number,
-            number,
-          ];
-        } else if (key in newParams && value !== "") {
-          (newParams as Record<string, unknown>)[key] = value;
-        }
-      });
+      if (key === "pinColor") {
+        parsedParams.pinColor = value;
+      } else if (key === "mapCenter") {
+        parsedParams.mapCenter = value.split(",").map(Number) as [
+          number,
+          number,
+        ];
+      } else if (key in parsedParams && value !== "") {
+        (parsedParams as Record<string, unknown>)[key] = value;
+      }
+    });
 
-      setParams(newParams); // Trigger state update
-    };
-
-    parseQueryParams();
-
-    const handleUrlChange = () => {
-      parseQueryParams(); // Re-parse URL on popstate
-    };
-
-    window.addEventListener("popstate", handleUrlChange);
-    return () => window.removeEventListener("popstate", handleUrlChange);
+    return parsedParams;
   }, []);
+
+  useEffect(() => {
+    // Set initial params
+    setParams(parseHashParams());
+
+    // Update params when hash changes
+    const handleHashChange = () => {
+      setParams(parseHashParams());
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [parseHashParams]);
 
   return params;
 };
