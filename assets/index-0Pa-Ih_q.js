@@ -1,4 +1,4 @@
-import{j as e,r}from"./index-Cp3jmcdL.js";import{f as V,a as E,M as k,S as T,L as H}from"./csvParse-4PSjikvu.js";const O=({mapFields:i})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(i)));const l=Object.entries(i).reduce((m,[t,n])=>t==="mapCenter"&&typeof n=="object"&&"lat"in n&&"lng"in n?`${m}${t}=${n.lat},${n.lng}&`:`${m}${t}=${n}&`,""),x=`${window.location.origin}/map?${l}`,o=`<iframe src="${x}" 
+import{j as e,r}from"./index-DYmtgJsq.js";import{f as V,a as E,M as k,S as T,L as H}from"./csvParse-Di5LFOHT.js";const O=({mapFields:i})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(i)));const l=Object.entries(i).reduce((m,[t,n])=>t==="mapCenter"&&typeof n=="object"&&"lat"in n&&"lng"in n?`${m}${t}=${n.lat},${n.lng}&`:`${m}${t}=${n}&`,""),x=`${window.location.origin}/#/map?${l}`,o=`<iframe src="${x}" 
     width="100%" 
     height="500px" 
     style="border: 1px solid #ccc">
