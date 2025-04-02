@@ -9,7 +9,7 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   value,
   onChange,
 }) => {
-  const [color, setColor] = useState(value);
+  const [color, setColor] = useState("#" + value);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = event.target.value;
