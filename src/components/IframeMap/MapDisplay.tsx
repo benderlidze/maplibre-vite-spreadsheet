@@ -89,73 +89,75 @@ export const MapDisplay = ({ params }: { params: UrlParams }) => {
         </div>
       )}
 
-      <Map
-        initialViewState={{
-          longitude: params.mapCenter?.[1] || 0,
-          latitude: params.mapCenter?.[0] || 0,
-          zoom: params.mapZoom || 1,
-          pitch: params.mapPitch || 0,
-          bearing: params.mapBearing || 0,
-        }}
-        style={{ width: "100%", height: "100%" }}
-        mapStyle={MAP_STYLES[params.mapStyle]}
-        interactiveLayerIds={mapData ? ["points"] : []}
-        onClick={onClick}
-        onMouseEnter={(e) => {
-          if (e.features?.[0]?.layer.id === "points") {
-            e.target.getCanvas().style.cursor = "pointer";
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.target.getCanvas().style.cursor = "";
-        }}
-        attributionControl={{
-          customAttribution:
-            "© <a href='https://geomapi.com/'>geomapi.com</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-        }}
-      >
-        <NavigationControl position="top-right" />
+      {!isLoading && (
+        <Map
+          initialViewState={{
+            longitude: Number(params.mapCenter?.[1]) || 0,
+            latitude: Number(params.mapCenter?.[0]) || 0,
+            zoom: Number(params.mapZoom) || 1,
+            pitch: Number(params.mapPitch) || 0,
+            bearing: Number(params.mapBearing) || 0,
+          }}
+          style={{ width: "100%", height: "100%" }}
+          mapStyle={MAP_STYLES[params.mapStyle]}
+          interactiveLayerIds={mapData ? ["points"] : []}
+          onClick={onClick}
+          onMouseEnter={(e) => {
+            if (e.features?.[0]?.layer.id === "points") {
+              e.target.getCanvas().style.cursor = "pointer";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.target.getCanvas().style.cursor = "";
+          }}
+          attributionControl={{
+            customAttribution:
+              "© <a href='https://geomapi.com/'>geomapi.com</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+          }}
+        >
+          <NavigationControl position="top-right" />
 
-        {mapData && (
-          <Source id="points-source" type="geojson" data={mapData}>
-            <Layer
-              id="points"
-              type="circle"
-              source="points-source"
-              paint={{
-                "circle-radius": 6,
-                "circle-color": params.pinColor
-                  ? `#${params.pinColor}`
-                  : "#007cbf",
-                "circle-stroke-width": 2,
-                "circle-stroke-color": "#ffffff",
-                "circle-opacity": 0.9,
-              }}
-            />
-          </Source>
-        )}
+          {mapData && (
+            <Source id="points-source" type="geojson" data={mapData}>
+              <Layer
+                id="points"
+                type="circle"
+                source="points-source"
+                paint={{
+                  "circle-radius": 6,
+                  "circle-color": params.pinColor
+                    ? `#${params.pinColor}`
+                    : "#007cbf",
+                  "circle-stroke-width": 2,
+                  "circle-stroke-color": "#ffffff",
+                  "circle-opacity": 0.9,
+                }}
+              />
+            </Source>
+          )}
 
-        {popupInfo && (
-          <Popup
-            longitude={popupInfo.longitude}
-            latitude={popupInfo.latitude}
-            anchor="bottom"
-            onClose={() => setPopupInfo(null)}
-            closeButton={true}
-            closeOnClick={false}
-            className="map-popup"
-          >
-            <div className="p-1">
-              <h3 className="font-bold text-gray-800">{popupInfo.name}</h3>
-              {popupInfo.description && (
-                <p className="text-sm text-gray-600 mt-1">
-                  {popupInfo.description}
-                </p>
-              )}
-            </div>
-          </Popup>
-        )}
-      </Map>
+          {popupInfo && (
+            <Popup
+              longitude={popupInfo.longitude}
+              latitude={popupInfo.latitude}
+              anchor="bottom"
+              onClose={() => setPopupInfo(null)}
+              closeButton={true}
+              closeOnClick={false}
+              className="map-popup"
+            >
+              <div className="p-1">
+                <h3 className="font-bold text-gray-800">{popupInfo.name}</h3>
+                {popupInfo.description && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {popupInfo.description}
+                  </p>
+                )}
+              </div>
+            </Popup>
+          )}
+        </Map>
+      )}
     </div>
   );
 };
