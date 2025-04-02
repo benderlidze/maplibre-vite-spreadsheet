@@ -72,8 +72,8 @@ export const fetchCSVData = async ({
 
 type GenerateGeoJSON = {
   data: DSVRowArray<string>;
-  latField: number;
-  lngField: number;
+  latField: string;
+  lngField: string;
   nameField?: string;
   descField?: string;
 };

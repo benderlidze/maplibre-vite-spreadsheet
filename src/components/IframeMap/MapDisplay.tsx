@@ -12,7 +12,20 @@ import { csv } from "d3-fetch";
 import { generateGeoJSON } from "../../helpers/csvParse";
 import { UrlParams } from "./constants";
 
-export const MapDisplay = ({ params }: { params: UrlParams }) => {
+type MapDisplayProps = {
+  params: UrlParams;
+  updateCustomProp?: (
+    prop: keyof UrlParams,
+    value: string | number | [number, number]
+  ) => void;
+  className?: string;
+};
+
+export const MapDisplay = ({
+  params,
+  updateCustomProp,
+  className,
+}: MapDisplayProps) => {
   console.log("params", params);
 
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
@@ -30,12 +43,17 @@ export const MapDisplay = ({ params }: { params: UrlParams }) => {
   useEffect(() => {
     const parseData = async () => {
       try {
-        if (params.dataURL && params.dataURL.length > 10) {
+        if (
+          params.dataURL &&
+          params.dataURL.length > 10 &&
+          params.latField !== "" &&
+          params.lngField !== ""
+        ) {
           const csvData = await csv(params.dataURL);
           const featureCollection = generateGeoJSON({
             data: csvData,
-            latField: params.latField ?? 0,
-            lngField: params.lngField ?? 0,
+            latField: params.latField ?? "",
+            lngField: params.lngField ?? "",
             nameField: params.nameField,
             descField: params.descField,
           });
@@ -70,7 +88,7 @@ export const MapDisplay = ({ params }: { params: UrlParams }) => {
   }, []);
 
   return (
-    <div className="h-screen relative">
+    <div className={`relative ` + className}>
       {isLoading && (
         <div className="flex items-center justify-center absolute z-10 h-full w-full bg-white bg-opacity-80">
           <div className="flex flex-col items-center gap-2">
@@ -92,8 +110,8 @@ export const MapDisplay = ({ params }: { params: UrlParams }) => {
       {!isLoading && (
         <Map
           initialViewState={{
-            longitude: Number(params.mapCenter?.[1]) || 0,
-            latitude: Number(params.mapCenter?.[0]) || 0,
+            longitude: Number(params.mapCenter?.[0]) || 0,
+            latitude: Number(params.mapCenter?.[1]) || 0,
             zoom: Number(params.mapZoom) || 1,
             pitch: Number(params.mapPitch) || 0,
             bearing: Number(params.mapBearing) || 0,
@@ -113,6 +131,22 @@ export const MapDisplay = ({ params }: { params: UrlParams }) => {
           attributionControl={{
             customAttribution:
               "© <a href='https://geomapi.com/'>geomapi.com</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+          }}
+          onIdle={(e) => {
+            if (updateCustomProp && updateCustomProp instanceof Function) {
+              const map = e.target;
+              const center = map.getCenter();
+              const zoom = map.getZoom().toFixed(2);
+              console.log("Center:", center, "Zoom:", zoom);
+
+              updateCustomProp("mapZoom", zoom);
+              updateCustomProp("mapCenter", [
+                +center.lng.toFixed(4),
+                +center.lat.toPrecision(4),
+              ]);
+              updateCustomProp("mapPitch", map.getPitch().toFixed(2));
+              updateCustomProp("mapBearing", map.getBearing().toFixed(2));
+            }
           }}
         >
           <NavigationControl position="top-right" />
