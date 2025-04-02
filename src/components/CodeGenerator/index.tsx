@@ -8,7 +8,19 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
   const params = new URLSearchParams();
   params.append("mapFields", encodeURIComponent(JSON.stringify(mapFields)));
 
-  const link = `${window.location.origin}/#/map?${params}`;
+  const getParams = Object.entries(mapFields).reduce((acc, [key, value]) => {
+    if (
+      key === "mapCenter" &&
+      typeof value === "object" &&
+      "lat" in value &&
+      "lng" in value
+    ) {
+      return `${acc}${key}=${value.lat},${value.lng}&`;
+    }
+    return `${acc}${key}=${value}&`;
+  }, "");
+
+  const link = `${window.location.origin}/map?${getParams}`;
   const iframeCode = `<iframe src="${link}" 
     width="100%" 
     height="500px" 

@@ -57,7 +57,7 @@ function Index() {
     nameField: "",
     descField: "",
     mapStyle: "Light",
-    pinColor: "#007cbf",
+    pinColor: "007cbf",
   });
 
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(

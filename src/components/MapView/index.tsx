@@ -29,8 +29,7 @@ export const MapView = ({
         <h3 className="text-lg font-medium">3. Map Preview </h3>
         <div className="flex flex-row items-center gap-4">
           <div>
-            Center: {`${lat.toFixed(2)},${lng.toFixed(2)}`} Zoom:{" "}
-            {zoom.toFixed(2)}
+            Center: {`${lat.toFixed(2)},${lng.toFixed(2)}`} Zoom: {zoom}
           </div>
           <div>
             <label htmlFor="map-style-select">Map style: </label>
@@ -52,8 +51,10 @@ export const MapView = ({
           </div>
           <div>
             <ColorPicker
-              value={mapProps.pinColor || "#007cbf"}
-              onChange={(value) => updateCustomProp("pinColor", value)}
+              value={mapProps.pinColor || "007cbf"}
+              onChange={(value) =>
+                updateCustomProp("pinColor", value.replace("#", ""))
+              }
             />
           </div>
         </div>
@@ -68,13 +69,16 @@ export const MapView = ({
         onIdle={(e) => {
           const map = e.target;
           const center = map.getCenter();
-          const zoom = map.getZoom();
+          const zoom = map.getZoom().toFixed(2);
           console.log("Center:", center, "Zoom:", zoom);
 
           updateCustomProp("mapZoom", zoom);
-          updateCustomProp("mapCenter", { lat: center.lat, lng: center.lng });
-          updateCustomProp("mapPitch", map.getPitch());
-          updateCustomProp("mapBearing", map.getBearing());
+          updateCustomProp("mapCenter", {
+            lat: +center.lat.toPrecision(4),
+            lng: +center.lng.toFixed(4),
+          });
+          updateCustomProp("mapPitch", map.getPitch().toFixed(2));
+          updateCustomProp("mapBearing", map.getBearing().toFixed(2));
         }}
         style={{ width: "100%", height: 400 }}
         mapStyle={MAP_STYLES[mapProps.mapStyle]}
@@ -85,7 +89,9 @@ export const MapView = ({
               type="circle"
               paint={{
                 "circle-radius": 5,
-                "circle-color": mapProps.pinColor,
+                "circle-color": mapProps.pinColor
+                  ? `#${mapProps.pinColor}`
+                  : "#007cbf",
                 "circle-stroke-width": 1,
                 "circle-stroke-color": "#fff",
               }}
