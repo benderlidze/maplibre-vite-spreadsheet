@@ -20,9 +20,9 @@ const RootComponent = () => {
             <Link to="/" className="[&.active]:font-bold">
               Create a map
             </Link>
-            {/* <Link to="/about" className="[&.active]:font-bold">
+            <Link to="/about" className="[&.active]:font-bold">
               About
-            </Link> */}
+            </Link>
             {/* <Link to="/geocoder" className="[&.active]:font-bold">
               Geocode
             </Link> */}

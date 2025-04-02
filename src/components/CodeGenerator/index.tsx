@@ -20,7 +20,7 @@ export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
     return `${acc}${key}=${value}&`;
   }, "");
 
-  const link = `${window.location.origin}/map?${getParams}`;
+  const link = `${window.location.origin}/#/map?${getParams}`;
   const iframeCode = `<iframe src="${link}" 
     width="100%" 
     height="500px" 
