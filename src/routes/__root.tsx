@@ -16,13 +16,13 @@ const RootComponent = () => {
       {!hideMenu && (
         <>
           <nav className="p-2 flex gap-2">
+            GeoMapi.com
             <Link to="/" className="[&.active]:font-bold">
               Create a map
             </Link>
-
-            <Link to="/about" className="[&.active]:font-bold">
+            {/* <Link to="/about" className="[&.active]:font-bold">
               About
-            </Link>
+            </Link> */}
             {/* <Link to="/geocoder" className="[&.active]:font-bold">
               Geocode
             </Link> */}
