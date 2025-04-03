@@ -21,7 +21,7 @@ const RootComponent = () => {
               Create a map
             </Link>
             <Link to="/about" className="[&.active]:font-bold">
-              About
+              Help & Instructions
             </Link>
             {/* <Link to="/geocoder" className="[&.active]:font-bold">
               Geocode
