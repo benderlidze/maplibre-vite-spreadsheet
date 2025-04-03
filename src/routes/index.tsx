@@ -5,6 +5,7 @@ import { CSVBox } from "../components/CSVBox";
 import { MapDisplay } from "../components/IframeMap/MapDisplay";
 import { MapSetUpProps } from "../components/IframeMap/MapSetUpProps";
 import { defaultParams, UrlParams } from "../components/IframeMap/constants";
+import { ColumnSelector } from "../components/ColumnSelector";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -53,7 +54,16 @@ function Index() {
               https://docs.google.com/spreadsheets/d/1GkiV0OF9ifo512SYUzbBzjMXnc1eI8puAdEBkdfYKxs
             </small>
           </h3>
-          <CSVBox mapProps={mapProps} updateCustomProp={updateCustomProp} />
+
+          <CSVBox
+            dataURL={mapProps.dataURL}
+            updateCustomProp={updateCustomProp}
+          />
+
+          <ColumnSelector
+            mapProps={mapProps}
+            updateCustomProp={updateCustomProp}
+          />
         </div>
 
         <MapSetUpProps

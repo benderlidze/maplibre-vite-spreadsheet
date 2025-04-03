@@ -4,9 +4,12 @@ export type UrlParams = {
   dataURL: string;
   latField: string;
   lngField: string;
-  mapStyle: keyof typeof MAP_STYLES;
   nameField?: string;
   descField?: string;
+
+  csvColumns?: Array<string>;
+
+  mapStyle: keyof typeof MAP_STYLES;
   pinColor?: string;
   mapCenter?: [number, number];
   mapZoom?: number;
@@ -15,7 +18,8 @@ export type UrlParams = {
 };
 
 export const defaultParams: UrlParams = {
-  dataURL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv",
+  dataURL:
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ1RLwN8Q0x34xLsVAnqlRaTVWT6gezOa4O87UYgpCz137eIiZ7zHnNbEPi6ELEPgpKQoehHxse74n-/pub?output=csv",
   latField: "",
   lngField: "",
   nameField: "name",
