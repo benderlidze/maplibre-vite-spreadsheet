@@ -1,7 +1,7 @@
-import { MapFields } from "../../routes";
+import { UrlParams } from "../IframeMap/constants";
 
 type CodeGeneratorProps = {
-  mapFields: MapFields;
+  mapFields: UrlParams;
 };
 
 export const CodeGenerator = ({ mapFields }: CodeGeneratorProps) => {
