@@ -8,6 +8,16 @@ function About() {
   return (
     <div className="p-2">
       <div className="max-w-3xl mx-auto p-6 space-y-6">
+        <iframe
+          className="w-full"
+          height="315"
+          src="https://www.youtube.com/embed/IslnUZMR-60?si=ujGnGtqjmEcozzkP"
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        ></iframe>
         <h1 className="text-2xl font-bold text-center">How to Use GeoMapi</h1>
         <div className="bg-white p-6 shadow-lg rounded-lg">
           <ul className="space-y-4">
