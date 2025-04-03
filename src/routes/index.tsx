@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 type MapFieldsAction = {
   type: "UPDATE_CUSTOM_PROP";
   prop: keyof UrlParams;
-  value: string | number | [number, number];
+  value: string | number | [number, number] | string[];
 };
 
 function mapFieldsReducer(
@@ -34,11 +34,12 @@ function Index() {
 
   const updateCustomProp = (
     prop: keyof UrlParams,
-    value: string | number | [number, number]
+    value: string | number | [number, number] | string[]
   ) => {
     dispatch({ type: "UPDATE_CUSTOM_PROP", prop, value });
   };
 
+  console.log("mapProps", mapProps.dataURL);
   console.log("mapProps", mapProps);
 
   return (

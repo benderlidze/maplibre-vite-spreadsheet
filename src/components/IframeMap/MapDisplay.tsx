@@ -16,7 +16,7 @@ type MapDisplayProps = {
   params: UrlParams;
   updateCustomProp?: (
     prop: keyof UrlParams,
-    value: string | number | [number, number]
+    value: string | number | [number, number] | string[]
   ) => void;
   className?: string;
 };

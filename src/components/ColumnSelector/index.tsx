@@ -5,7 +5,7 @@ type ColumnSelectorProps = {
   mapProps: UrlParams;
   updateCustomProp: (
     prop: keyof UrlParams,
-    value: string | number | [number, number]
+    value: string | number | [number, number] | string[]
   ) => void;
 };
 
@@ -82,10 +82,10 @@ export const ColumnSelector = ({
   );
 
   return (
-    <div className="space-y-4">
+    <div>
       {headers.length > 0 && (
         <>
-          <h3 className="text-lg font-medium mb-3">2. Select Fields </h3>
+          <h3 className="text-lg font-medium my-3">2. Select Fields </h3>
           <div className="p-4 border border-gray-300 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {renderFieldSelector(

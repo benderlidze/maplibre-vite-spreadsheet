@@ -5,9 +5,9 @@ import React from "react";
 
 type CSVBoxProps = {
   dataURL: string;
-  updateCustomProp: <K extends keyof UrlParams>(
-    prop: K,
-    value: UrlParams[K]
+  updateCustomProp: (
+    prop: keyof UrlParams,
+    value: string | number | [number, number] | string[]
   ) => void;
 };
 

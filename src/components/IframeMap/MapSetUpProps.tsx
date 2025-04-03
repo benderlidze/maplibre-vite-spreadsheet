@@ -6,7 +6,7 @@ type MapSetUpProps = {
   mapProps: UrlParams;
   updateCustomProp: (
     prop: keyof UrlParams,
-    value: string | number | [number, number]
+    value: string | number | [number, number] | string[]
   ) => void;
 };
 
