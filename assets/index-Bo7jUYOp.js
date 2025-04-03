@@ -1,4 +1,4 @@
-import{j as e,r as C}from"./index-DGN6YQuC.js";import{f,a as v,d as b,M as w}from"./MapDisplay-CDNAiomv.js";const y=({mapFields:t})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(t)));const o=Object.entries(t).reduce((c,[d,i])=>d==="mapCenter"&&typeof i=="object"&&"lat"in i&&"lng"in i?`${c}${d}=${i.lat},${i.lng}&`:`${c}${d}=${i}&`,""),r=`${window.location.origin}/#/map?${o}`,a=`<iframe src="${r}" 
+import{j as e,r as C}from"./index-BxRj2uhg.js";import{f,a as v,d as b,M as w}from"./MapDisplay-wPUd6WIS.js";const y=({mapFields:t})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(t)));const o=Object.entries(t).reduce((c,[d,i])=>d==="mapCenter"&&typeof i=="object"&&"lat"in i&&"lng"in i?`${c}${d}=${i.lat},${i.lng}&`:`${c}${d}=${i}&`,""),r=`${window.location.origin}/#/map?${o}`,a=`<iframe src="${r}" 
     width="100%" 
     height="500px" 
     style="border: 1px solid #ccc">
