@@ -69,7 +69,13 @@ export const MapDisplay = ({
     };
 
     parseData();
-  }, [params]);
+  }, [
+    params.dataURL,
+    params.latField,
+    params.lngField,
+    params.nameField,
+    params.descField,
+  ]);
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0];
