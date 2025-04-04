@@ -136,7 +136,7 @@ export const MapDisplay = ({
           }}
           attributionControl={{
             customAttribution:
-              "© <a href='https://geomapi.com/'>geomapi.com</a> <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+              "© Need a map like this -> <a href='https://geomapi.com/'>geomapi.com</a>",
           }}
           onIdle={(e) => {
             if (updateCustomProp && updateCustomProp instanceof Function) {

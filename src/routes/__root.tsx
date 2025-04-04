@@ -15,17 +15,33 @@ const RootComponent = () => {
     <>
       {!hideMenu && (
         <>
-          <nav className="p-2 flex gap-2">
-            GeoMapi.com
-            <Link to="/" className="[&.active]:font-bold">
-              Create a map
-            </Link>
-            <Link to="/about" className="[&.active]:font-bold">
-              Help & Instructions
-            </Link>
-            {/* <Link to="/geocoder" className="[&.active]:font-bold">
-              Geocode
-            </Link> */}
+          <nav
+            className="p-2 flex items-center justify-between"
+            style={{ backgroundColor: "#fdfbf8" }}
+          >
+            <div className="flex items-center gap-4">
+              <img src="logo.svg" alt="Logo" className="h-10 w-10" />
+              <div>
+                <h1 className="text-lg font-bold">GeoMapi.com</h1>
+                <p className="text-sm text-gray-600">
+                  Your map creation partner
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-6">
+              <Link
+                to="/"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+              >
+                Create a Map
+              </Link>
+              <Link
+                to="/about"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+              >
+                Help & Instructions
+              </Link>
+            </div>
           </nav>
           <hr />
         </>
