@@ -1,4 +1,4 @@
-import{j as e,R as p,r as x}from"./index-BQAf-rlS.js";import{f as h,a as f,d as j,M as v}from"./MapDisplay-BJxdNngH.js";const b=({mapFields:l})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(l)));const i=Object.entries(l).reduce((t,[a,n])=>a==="mapCenter"&&typeof n=="object"&&"lat"in n&&"lng"in n?`${t}${a}=${n.lat},${n.lng}&`:`${t}${a}=${n}&`,""),o=`${window.location.origin}/#/map?${i}`,r=`<iframe src="${o}" 
+import{j as e,R as p,r as x}from"./index-CASPCyZ-.js";import{f as h,a as f,d as j,M as v}from"./MapDisplay-Evvh12_8.js";const b=({mapFields:l})=>{new URLSearchParams().append("mapFields",encodeURIComponent(JSON.stringify(l)));const i=Object.entries(l).reduce((t,[a,n])=>a==="mapCenter"&&typeof n=="object"&&"lat"in n&&"lng"in n?`${t}${a}=${n.lat},${n.lng}&`:`${t}${a}=${n}&`,""),o=`${window.location.origin}/#/map?${i}`,r=`<iframe src="${o}" 
     width="100%" 
     height="500px" 
     style="border: 1px solid #ccc">
