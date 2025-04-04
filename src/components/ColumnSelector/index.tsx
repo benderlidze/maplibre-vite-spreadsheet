@@ -96,9 +96,14 @@ export const ColumnSelector = ({
                 },
                 true
               )}
-              {renderFieldSelector("Longitude", mapProps.lngField, (value) => {
-                updateCustomProp("lngField", value);
-              })}
+              {renderFieldSelector(
+                "Longitude",
+                mapProps.lngField,
+                (value) => {
+                  updateCustomProp("lngField", value);
+                },
+                true
+              )}
               {renderFieldSelector(
                 "Marker Title (optional)",
                 mapProps.nameField || "",
