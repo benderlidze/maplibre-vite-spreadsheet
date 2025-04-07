@@ -278,7 +278,7 @@ function RouteComponent() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
-        File Upload & Column Extraction
+        Uplod a CSV or Excel file for Geocoding
       </h1>
 
       <div
