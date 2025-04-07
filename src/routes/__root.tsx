@@ -38,6 +38,12 @@ const RootComponent = () => {
                 Create a Map
               </Link>
               <Link
+                to="/geocoder"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+              >
+                Geocoder
+              </Link>
+              <Link
                 to="/about"
                 className="hover:text-blue-400 transition-colors [&.active]:font-bold"
               >
