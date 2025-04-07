@@ -26,7 +26,7 @@ function RouteComponent() {
     Record<string, boolean>
   >({});
   // Add new state variables for geocoding
-  const [rawData, setRawData] = useState<any[]>([]);
+  const [rawData, setRawData] = useState<Record<string, unknown>[]>([]);
   const [geocodingResults, setGeocodingResults] = useState<GeocodingResult[]>(
     []
   );
@@ -46,11 +46,16 @@ function RouteComponent() {
       Papa.parse(file, {
         header: true,
         complete: (results) => {
-          if (results.data.length > 0) {
-            const columns = Object.keys(results.data[0]);
+          console.log("results", results);
+          if (
+            results.data.length > 0 &&
+            typeof results.data[0] === "object" &&
+            results.data[0] !== null
+          ) {
+            const columns = Object.keys(results.data[0] as object);
             setColumns(columns);
             setRowCount(results.data.length);
-            setRawData(results.data); // Store the raw data
+            setRawData(results.data as Record<string, unknown>[]); // Store the raw data
             // Initialize all columns as unselected
             const initialSelected = columns.reduce(
               (acc, column) => {
@@ -77,10 +82,10 @@ function RouteComponent() {
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         if (jsonData.length > 0) {
-          const columns = Object.keys(jsonData[0]);
+          const columns = Object.keys(jsonData[0] as object);
           setColumns(columns);
           setRowCount(jsonData.length);
-          setRawData(jsonData); // Store the raw data
+          setRawData(jsonData as Record<string, unknown>[]); // Store the raw data
           // Initialize all columns as unselected
           const initialSelected = columns.reduce(
             (acc, column) => {
@@ -223,7 +228,7 @@ function RouteComponent() {
     return enrichedData;
   };
 
-  const downloadAsCSV = (data: any[]) => {
+  const downloadAsCSV = (data: unknown[]) => {
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -236,7 +241,7 @@ function RouteComponent() {
     document.body.removeChild(link);
   };
 
-  const downloadAsExcel = (data: any[]) => {
+  const downloadAsExcel = (data: unknown[]) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Geocoded");
@@ -303,26 +308,31 @@ function RouteComponent() {
         </p>
       )}
 
-      {rowCount > 0 && (
-        <p className="mb-2">
-          <strong>Number of rows:</strong> {rowCount}
-        </p>
-      )}
-
       {columns.length > 0 && (
-        <div className="">
-          <h2 className="text-xl font-semibold mb-2">Columns Found:</h2>
-          <ul className="pl-5 ">
+        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 mt-4">
+          <div className="flex flex-row justify-between items-center mb-4 border-b pb-3">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Select columns to include in the geocoding process:
+            </h2>
+            {rowCount > 0 && (
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                {rowCount} {rowCount === 1 ? "row" : "rows"}
+              </span>
+            )}
+          </div>
+          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ">
             {columns.map((column, index) => (
-              <li key={index} className="mb-2 flex items-center">
+              <li key={index} className="flex items-center  ">
                 <input
                   type="checkbox"
                   id={`column-${index}`}
                   checked={selectedColumns[column] || false}
                   onChange={() => handleColumnChange(column)}
-                  className="mr-2"
+                  className=" mr-3  "
                 />
-                <label htmlFor={`column-${index}`}>{column}</label>
+                <label htmlFor={`column-${index}`} className="cursor-pointer ">
+                  {column}
+                </label>
               </li>
             ))}
           </ul>
@@ -345,17 +355,28 @@ function RouteComponent() {
             </p>
           )}
 
-          <button
-            onClick={geocodeAddresses}
-            disabled={isGeocoding || selectedColumnCount === 0}
-            className={`px-4 py-2 rounded ${
-              isGeocoding || selectedColumnCount === 0
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            }`}
-          >
-            {isGeocoding ? "Geocoding..." : "Start Geocoding"}
-          </button>
+          <div className="flex flex-row gap-3 ">
+            <button
+              onClick={geocodeAddresses}
+              disabled={isGeocoding || selectedColumnCount === 0}
+              className={`px-4 py-2 rounded ${
+                isGeocoding || selectedColumnCount === 0
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600 text-white"
+              }`}
+            >
+              {isGeocoding ? "Geocoding..." : "Start Geocoding"}
+            </button>
+
+            {geocodingResults.length > 0 && (
+              <button
+                onClick={handleDownload}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
+              >
+                Download Geocoded Data
+              </button>
+            )}
+          </div>
 
           {isGeocoding && (
             <div className="mt-4">
@@ -422,17 +443,6 @@ function RouteComponent() {
                   </tbody>
                 </table>
               </div>
-            </div>
-          )}
-
-          {geocodingResults.length > 0 && (
-            <div className="mt-4">
-              <button
-                onClick={handleDownload}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
-              >
-                Download Geocoded Data
-              </button>
             </div>
           )}
         </div>
