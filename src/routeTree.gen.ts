@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as MapImport } from './routes/map'
+import { Route as GeojsonImport } from './routes/geojson'
 import { Route as GeocoderImport } from './routes/geocoder'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
@@ -21,6 +22,12 @@ import { Route as IndexImport } from './routes/index'
 const MapRoute = MapImport.update({
   id: '/map',
   path: '/map',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GeojsonRoute = GeojsonImport.update({
+  id: '/geojson',
+  path: '/geojson',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +74,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GeocoderImport
       parentRoute: typeof rootRoute
     }
+    '/geojson': {
+      id: '/geojson'
+      path: '/geojson'
+      fullPath: '/geojson'
+      preLoaderRoute: typeof GeojsonImport
+      parentRoute: typeof rootRoute
+    }
     '/map': {
       id: '/map'
       path: '/map'
@@ -83,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/geocoder': typeof GeocoderRoute
+  '/geojson': typeof GeojsonRoute
   '/map': typeof MapRoute
 }
 
@@ -90,6 +105,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/geocoder': typeof GeocoderRoute
+  '/geojson': typeof GeojsonRoute
   '/map': typeof MapRoute
 }
 
@@ -98,15 +114,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/geocoder': typeof GeocoderRoute
+  '/geojson': typeof GeojsonRoute
   '/map': typeof MapRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/geocoder' | '/map'
+  fullPaths: '/' | '/about' | '/geocoder' | '/geojson' | '/map'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/geocoder' | '/map'
-  id: '__root__' | '/' | '/about' | '/geocoder' | '/map'
+  to: '/' | '/about' | '/geocoder' | '/geojson' | '/map'
+  id: '__root__' | '/' | '/about' | '/geocoder' | '/geojson' | '/map'
   fileRoutesById: FileRoutesById
 }
 
@@ -114,6 +131,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   GeocoderRoute: typeof GeocoderRoute
+  GeojsonRoute: typeof GeojsonRoute
   MapRoute: typeof MapRoute
 }
 
@@ -121,6 +139,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   GeocoderRoute: GeocoderRoute,
+  GeojsonRoute: GeojsonRoute,
   MapRoute: MapRoute,
 }
 
@@ -137,6 +156,7 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/geocoder",
+        "/geojson",
         "/map"
       ]
     },
@@ -148,6 +168,9 @@ export const routeTree = rootRoute
     },
     "/geocoder": {
       "filePath": "geocoder.tsx"
+    },
+    "/geojson": {
+      "filePath": "geojson.tsx"
     },
     "/map": {
       "filePath": "map.tsx"

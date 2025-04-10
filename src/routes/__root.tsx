@@ -12,11 +12,11 @@ const RootComponent = () => {
   const hideMenu = location.pathname.startsWith("/map");
 
   return (
-    <>
+    <div className="flex flex-col h-screen">
       {!hideMenu && (
         <>
           <nav
-            className="p-2 flex items-center justify-between"
+            className="p-2 flex items-center justify-between shrink-0"
             style={{ backgroundColor: "#fdfbf8" }}
           >
             <Link to="/">
@@ -24,9 +24,6 @@ const RootComponent = () => {
                 <img src="logo.svg" alt="Logo" className="h-10 w-10" />
                 <div>
                   <h1 className="text-lg font-bold">GeoMapi.com</h1>
-                  <p className="text-sm text-gray-600">
-                    Your map creation partner
-                  </p>
                 </div>
               </div>
             </Link>
@@ -44,6 +41,12 @@ const RootComponent = () => {
                 Geocoder
               </Link>
               <Link
+                to="/geojson"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+              >
+                Geojson
+              </Link>
+              <Link
                 to="/about"
                 className="hover:text-blue-400 transition-colors [&.active]:font-bold"
               >
@@ -51,11 +54,13 @@ const RootComponent = () => {
               </Link>
             </div>
           </nav>
-          <hr />
+          <hr className="shrink-0" />
         </>
       )}
-      <Outlet />
-    </>
+      <div className="flex-1 overflow-hidden">
+        <Outlet />
+      </div>
+    </div>
   );
 };
 
