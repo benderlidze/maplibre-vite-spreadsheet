@@ -57,7 +57,7 @@ const RootComponent = () => {
           <hr className="shrink-0" />
         </>
       )}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 ">
         <Outlet />
       </div>
     </div>

@@ -3,9 +3,13 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { MAP_STYLES } from "../../contants";
 import { useState, useCallback } from "react";
 import type { FeatureCollection } from "geojson";
+import { MapLibreEvent } from "maplibre-gl";
+import { Geoman } from "@geoman-io/maplibre-geoman-free";
 
 export const Geojson = () => {
-  const [geojsonData, setGeojsonData] = useState<FeatureCollection | null>(null);
+  const [geojsonData, setGeojsonData] = useState<FeatureCollection | null>(
+    null
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -13,13 +17,16 @@ export const Geojson = () => {
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
-      
-      if (file.name.endsWith('.geojson') || file.type === "application/geo+json") {
+
+      if (
+        file.name.endsWith(".geojson") ||
+        file.type === "application/geo+json"
+      ) {
         const reader = new FileReader();
-        
+
         reader.onload = (event) => {
           try {
             const data = JSON.parse(event.target?.result as string);
@@ -28,14 +35,14 @@ export const Geojson = () => {
             console.error("Error parsing GeoJSON:", error);
           }
         };
-        
+
         reader.readAsText(file);
       }
     }
   }, []);
 
   return (
-    <div 
+    <div
       className="flex flex-1 w-full h-full"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
@@ -59,9 +66,12 @@ export const Geojson = () => {
           customAttribution:
             "© Need a map like this -> <a href='https://geomapi.com/'>geomapi.com</a>",
         }}
+        onLoad={(evt: MapLibreEvent) => {
+          new Geoman(evt.target);
+        }}
       >
         <NavigationControl position="top-right" />
-        
+
         {geojsonData && (
           <Source id="geojson-data" type="geojson" data={geojsonData}>
             <Layer

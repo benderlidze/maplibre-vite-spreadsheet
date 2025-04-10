@@ -11,6 +11,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "@geoman-io/maplibre-geoman-free": "^0.3.0",
     "@tailwindcss/vite": "^4.0.15",
     "@tanstack/react-router": "^1.114.32",
     "d3-fetch": "^3.0.1",
