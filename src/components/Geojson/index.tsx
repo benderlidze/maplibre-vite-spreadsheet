@@ -7,6 +7,10 @@ import { drawStyles } from "./drawStyles";
 import bbox from "@turf/bbox";
 import { MAP_STYLES } from "../../contants";
 import { MapStyleSwitcher } from "./MapStyleSwitcher";
+import {
+  loadGeoJSONFromStorage,
+  saveGeoJSONToStorage,
+} from "../../helpers/localStorage";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -21,6 +25,18 @@ export const GmMap: React.FC = () => {
   const drawInstance = useRef<MapboxDraw | null>(null);
   const [currentStyle, setCurrentStyle] =
     useState<keyof typeof MAP_STYLES>("OSM");
+  const [bounds, setBounds] = useState<[number, number][]>();
+
+  console.log("bounds", bounds);
+
+  useEffect(() => {
+    if (bounds && mapInstance.current) {
+      mapInstance.current.fitBounds([bounds[0], bounds[1]], {
+        padding: 50,
+        maxZoom: 16,
+      });
+    }
+  }, [bounds]);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -101,16 +117,29 @@ export const GmMap: React.FC = () => {
 
                       // Calculate bounds with TurfJS
                       if (geoJson.features.length > 0) {
-                        const bounds = bbox(geoJson);
+                        const bounds_ = bbox(geoJson);
                         // Bounds from TurfJS are in [minX, minY, maxX, maxY] format
                         // Convert to MapLibre bounds format [[minX, minY], [maxX, maxY]]
                         mapInstance.current?.fitBounds(
                           [
-                            [bounds[0], bounds[1]],
-                            [bounds[2], bounds[3]],
+                            [bounds_[0], bounds_[1]],
+                            [bounds_[2], bounds_[3]],
                           ],
                           { padding: 50, maxZoom: 16 }
                         );
+
+                        setBounds([
+                          [bounds_[0], bounds_[1]],
+                          [bounds_[2], bounds_[3]],
+                        ]);
+                      }
+
+                      // Save to localStorage after adding to map
+                      const allFeatures = drawInstance.current?.getAll();
+                      if (allFeatures) {
+                        saveGeoJSONToStorage({
+                          data: allFeatures,
+                        });
                       }
                     } else {
                       console.error("Invalid GeoJSON format");
@@ -136,6 +165,55 @@ export const GmMap: React.FC = () => {
         const container = map.getContainer();
         container.addEventListener("dragover", handleDragOver);
         container.addEventListener("drop", handleDrop);
+
+        // Load GeoJSON data from localStorage when the map is ready
+        const savedGeoJSON = loadGeoJSONFromStorage();
+        if (savedGeoJSON && drawInstance.current) {
+          // Add features from localStorage to the map
+          drawInstance.current.add(savedGeoJSON);
+
+          // If there are features, fit the map to their bounds
+          if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
+            try {
+              const bounds_ = bbox(savedGeoJSON);
+              mapInstance.current?.fitBounds(
+                [
+                  [bounds_[0], bounds_[1]],
+                  [bounds_[2], bounds_[3]],
+                ],
+                { padding: 50, maxZoom: 16 }
+              );
+              setBounds([
+                [bounds_[0], bounds_[1]],
+                [bounds_[2], bounds_[3]],
+              ]);
+            } catch (error) {
+              console.error("Error fitting bounds to saved features:", error);
+            }
+          }
+        }
+      });
+
+      // Save GeoJSON when features are created, updated or deleted
+      map.on("draw.create", () => {
+        if (drawInstance.current) {
+          const allFeatures = drawInstance.current.getAll();
+          saveGeoJSONToStorage({ data: allFeatures });
+        }
+      });
+
+      map.on("draw.update", () => {
+        if (drawInstance.current) {
+          const allFeatures = drawInstance.current.getAll();
+          saveGeoJSONToStorage({ data: allFeatures });
+        }
+      });
+
+      map.on("draw.delete", () => {
+        if (drawInstance.current) {
+          const allFeatures = drawInstance.current.getAll();
+          saveGeoJSONToStorage({ data: allFeatures });
+        }
       });
 
       return () => {
