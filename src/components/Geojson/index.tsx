@@ -5,13 +5,16 @@ import ml from "maplibre-gl";
 import React, { useEffect, useRef } from "react";
 
 const gmOptions = {
+  settings: {
+    controlsPosition: "top-right",
+  },
   controls: {
-    helper: {
-      snapping: {
-        uiEnabled: true,
-        active: true,
-      },
-    },
+    // helper: {
+    //   snapping: {
+    //     uiEnabled: true,
+    //     active: true,
+    //   },
+    // },
   },
 };
 
@@ -49,6 +52,9 @@ export const GmMap: React.FC = () => {
         zoom: 5,
         fadeDuration: 50,
       });
+
+      // Add navigation control (zoom and rotation controls)
+      map.addControl(new ml.NavigationControl(), "top-right");
 
       mapInstance.current = map;
       const geoman = new Geoman(map, gmOptions);
