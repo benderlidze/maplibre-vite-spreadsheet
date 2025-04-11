@@ -174,16 +174,16 @@ export const GmMap: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-1 w-full h-full">
+    <div className="flex flex-1 w-full h-full flex-row">
       <div
         id="dev-map"
         ref={mapRef}
         style={{
-          width: "100%",
           height: "100%",
-          flex: "1 1 auto",
+          flex: 1,
         }}
       ></div>
+      <div className="flex w-1/4">asdas</div>
     </div>
   );
 };
