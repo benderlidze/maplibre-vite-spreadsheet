@@ -7,6 +7,7 @@ export const MAP_STYLES = {
   Contrast: "https://demotiles.maplibre.org/style.json",
   OSM: {
     version: 8,
+    glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
     sources: {
       osm: {
         type: "raster",

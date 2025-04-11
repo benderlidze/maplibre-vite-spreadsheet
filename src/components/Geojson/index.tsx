@@ -1,10 +1,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import ml, { IControl } from "maplibre-gl";
-import React, { useEffect, useRef } from "react";
+import ml from "maplibre-gl";
+import React, { useEffect, useRef, useState } from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { drawStyles } from "./drawStyles";
 import bbox from "@turf/bbox";
+import { MAP_STYLES } from "../../contants";
+import { MapStyleSwitcher } from "./MapStyleSwitcher";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -17,32 +19,14 @@ export const GmMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<ml.Map | null>(null);
   const drawInstance = useRef<MapboxDraw | null>(null);
+  const [currentStyle, setCurrentStyle] =
+    useState<keyof typeof MAP_STYLES>("OSM");
 
   useEffect(() => {
     if (mapRef.current) {
       const map = new ml.Map({
         container: mapRef.current,
-        style: {
-          version: 8,
-          glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
-          sources: {
-            "osm-tiles": {
-              type: "raster",
-              tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
-              tileSize: 256,
-              attribution: "© OpenStreetMap contributors",
-            },
-          },
-          layers: [
-            {
-              id: "osm-tiles-layer",
-              type: "raster",
-              source: "osm-tiles",
-              minzoom: 0,
-              maxzoom: 19,
-            },
-          ],
-        },
+        style: MAP_STYLES[currentStyle],
         center: [0, 0],
         zoom: 1,
         fadeDuration: 50,
@@ -55,19 +39,16 @@ export const GmMap: React.FC = () => {
       const draw = new MapboxDraw({
         displayControlsDefault: false,
         styles: drawStyles, // Add custom styles to make lines visible
-        //custom buttons
         controls: {
           point: true,
           line_string: true,
           polygon: true,
           trash: true,
-          // combine_features: true,
-          // uncombine_features: true,
         },
       });
 
       // Add draw control to the map and cast map to any to bypass type checking
-      map.addControl(draw as unknown as IControl, "top-right");
+      map.addControl(draw as unknown as ml.IControl, "top-right");
       drawInstance.current = draw;
 
       mapInstance.current = map;
@@ -172,10 +153,10 @@ export const GmMap: React.FC = () => {
         mapInstance.current.remove();
       }
     };
-  }, []);
+  }, [currentStyle]);
 
   return (
-    <div className="flex flex-1 w-full h-full flex-row">
+    <div className="flex flex-1 w-full h-full flex-row relative">
       <div
         id="dev-map"
         ref={mapRef}
@@ -184,6 +165,12 @@ export const GmMap: React.FC = () => {
           flex: 1,
         }}
       ></div>
+
+      <MapStyleSwitcher
+        currentStyle={currentStyle}
+        setCurrentStyle={setCurrentStyle}
+      />
+
       <div className="flex flex-col w-1/4 p-4 bg-gray-100">123</div>
     </div>
   );
