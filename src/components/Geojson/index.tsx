@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { drawStyles } from "./drawStyles";
+import bbox from "@turf/bbox";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -42,8 +43,8 @@ export const GmMap: React.FC = () => {
             },
           ],
         },
-        center: [0, 51],
-        zoom: 5,
+        center: [0, 0],
+        zoom: 1,
         fadeDuration: 50,
       });
 
@@ -107,7 +108,8 @@ export const GmMap: React.FC = () => {
 
                     // Handle both FeatureCollection and individual Feature
                     if (
-                      geoJson.type === "FeatureCollection" &&
+                      (geoJson.type === "FeatureCollection" ||
+                        geoJson.type === "Feature") &&
                       geoJson.features
                     ) {
                       console.log(
@@ -115,10 +117,20 @@ export const GmMap: React.FC = () => {
                       );
                       // Add all features from the collection to the draw instance
                       drawInstance.current?.add(geoJson);
-                    } else if (geoJson.type === "Feature") {
-                      console.log(`Imported feature from ${file.name}`);
-                      // Add the individual feature to the draw instance
-                      drawInstance.current?.add(geoJson);
+
+                      // Calculate bounds with TurfJS
+                      if (geoJson.features.length > 0) {
+                        const bounds = bbox(geoJson);
+                        // Bounds from TurfJS are in [minX, minY, maxX, maxY] format
+                        // Convert to MapLibre bounds format [[minX, minY], [maxX, maxY]]
+                        mapInstance.current?.fitBounds(
+                          [
+                            [bounds[0], bounds[1]],
+                            [bounds[2], bounds[3]],
+                          ],
+                          { padding: 50, maxZoom: 16 }
+                        );
+                      }
                     } else {
                       console.error("Invalid GeoJSON format");
                     }
