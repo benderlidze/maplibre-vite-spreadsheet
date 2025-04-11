@@ -1,27 +1,21 @@
-import { GeoJsonImportFeature, Geoman } from "@geoman-io/maplibre-geoman-free";
-import "@geoman-io/maplibre-geoman-free/dist/maplibre-geoman.css";
 import "maplibre-gl/dist/maplibre-gl.css";
-import ml from "maplibre-gl";
+import ml, { IControl } from "maplibre-gl";
 import React, { useEffect, useRef } from "react";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import { drawStyles } from "./drawStyles";
 
-const gmOptions = {
-  settings: {
-    controlsPosition: "top-right",
-  },
-  controls: {
-    // helper: {
-    //   snapping: {
-    //     uiEnabled: true,
-    //     active: true,
-    //   },
-    // },
-  },
-};
+// @ts-expect-error ignore
+MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
+// @ts-expect-error ignore
+MapboxDraw.constants.classes.CONTROL_PREFIX = "maplibregl-ctrl-";
+// @ts-expect-error ignore
+MapboxDraw.constants.classes.CONTROL_GROUP = "maplibregl-ctrl-group";
 
 export const GmMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<ml.Map | null>(null);
-  const geomanInstance = useRef<Geoman | null>(null);
+  const drawInstance = useRef<MapboxDraw | null>(null);
 
   useEffect(() => {
     if (mapRef.current) {
@@ -56,23 +50,26 @@ export const GmMap: React.FC = () => {
       // Add navigation control (zoom and rotation controls)
       map.addControl(new ml.NavigationControl(), "top-right");
 
+      // Initialize MapboxDraw with custom styles
+      const draw = new MapboxDraw({
+        displayControlsDefault: false,
+        styles: drawStyles, // Add custom styles to make lines visible
+        //custom buttons
+        controls: {
+          point: true,
+          line_string: true,
+          polygon: true,
+          trash: true,
+          // combine_features: true,
+          // uncombine_features: true,
+        },
+      });
+
+      // Add draw control to the map and cast map to any to bypass type checking
+      map.addControl(draw as unknown as IControl, "top-right");
+      drawInstance.current = draw;
+
       mapInstance.current = map;
-      const geoman = new Geoman(map, gmOptions);
-      geomanInstance.current = geoman;
-
-      // Define loadDevShapes inside useEffect to handle dependencies correctly
-      // const loadDevShapes = () => {
-      //   if (!geomanInstance.current) {
-      //     console.warn("Geoman not loaded yet");
-      //     return;
-      //   }
-
-      //   // demoFeatures.forEach((shapeGeoJson) => {
-      //   //   geomanInstance.current!.features.importGeoJsonFeature(shapeGeoJson);
-      //   // });
-
-      //   // console.log("Shapes loaded", demoFeatures);
-      // };
 
       // Handle drag and drop functionality for GeoJSON files
       const handleDragOver = (e: DragEvent) => {
@@ -87,7 +84,7 @@ export const GmMap: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!geomanInstance.current) {
+        if (!drawInstance.current) {
           console.warn("Geoman not loaded yet");
           return;
         }
@@ -113,19 +110,15 @@ export const GmMap: React.FC = () => {
                       geoJson.type === "FeatureCollection" &&
                       geoJson.features
                     ) {
-                      geoJson.features.forEach((feature: GeoJSON.Feature) => {
-                        geomanInstance.current!.features.importGeoJsonFeature(
-                          feature as GeoJsonImportFeature
-                        );
-                      });
                       console.log(
                         `Imported ${geoJson.features.length} features from ${file.name}`
                       );
+                      // Add all features from the collection to the draw instance
+                      drawInstance.current?.add(geoJson);
                     } else if (geoJson.type === "Feature") {
-                      geomanInstance.current!.features.importGeoJsonFeature(
-                        geoJson
-                      );
                       console.log(`Imported feature from ${file.name}`);
+                      // Add the individual feature to the draw instance
+                      drawInstance.current?.add(geoJson);
                     } else {
                       console.error("Invalid GeoJSON format");
                     }
@@ -143,12 +136,8 @@ export const GmMap: React.FC = () => {
         }
       };
 
-      map.on("gm:loaded", () => {
-        console.log("Geoman loaded", geoman);
-        // Enable drawing tools
-        //geoman.enableDraw("line");
-        // Load demo shapes
-        // loadDevShapes();
+      map.on("load", () => {
+        console.log("drawInstance loaded", drawInstance);
 
         // Add drag and drop event listeners after Geoman is loaded
         const container = map.getContainer();
@@ -183,7 +172,7 @@ export const GmMap: React.FC = () => {
           flex: 1,
         }}
       ></div>
-      <div className="flex w-1/4">asdas</div>
+      <div className="flex flex-col w-1/4 p-4 bg-gray-100">123</div>
     </div>
   );
 };
