@@ -1,4 +1,4 @@
-import { Geoman } from "@geoman-io/maplibre-geoman-free";
+import { GeoJsonImportFeature, Geoman } from "@geoman-io/maplibre-geoman-free";
 import "@geoman-io/maplibre-geoman-free/dist/maplibre-geoman.css";
 import "maplibre-gl/dist/maplibre-gl.css";
 import ml from "maplibre-gl";
@@ -55,26 +55,109 @@ export const GmMap: React.FC = () => {
       geomanInstance.current = geoman;
 
       // Define loadDevShapes inside useEffect to handle dependencies correctly
-      const loadDevShapes = () => {
+      // const loadDevShapes = () => {
+      //   if (!geomanInstance.current) {
+      //     console.warn("Geoman not loaded yet");
+      //     return;
+      //   }
+
+      //   // demoFeatures.forEach((shapeGeoJson) => {
+      //   //   geomanInstance.current!.features.importGeoJsonFeature(shapeGeoJson);
+      //   // });
+
+      //   // console.log("Shapes loaded", demoFeatures);
+      // };
+
+      // Handle drag and drop functionality for GeoJSON files
+      const handleDragOver = (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer) {
+          e.dataTransfer.dropEffect = "copy";
+        }
+      };
+
+      const handleDrop = (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
         if (!geomanInstance.current) {
           console.warn("Geoman not loaded yet");
           return;
         }
 
-        // demoFeatures.forEach((shapeGeoJson) => {
-        //   geomanInstance.current!.features.importGeoJsonFeature(shapeGeoJson);
-        // });
+        if (e.dataTransfer && e.dataTransfer.files) {
+          const files = Array.from(e.dataTransfer.files);
 
-        // console.log("Shapes loaded", demoFeatures);
+          files.forEach((file) => {
+            if (
+              file.type === "application/geo+json" ||
+              file.name.endsWith(".geojson") ||
+              file.name.endsWith(".json")
+            ) {
+              const reader = new FileReader();
+
+              reader.onload = (event) => {
+                try {
+                  if (event.target && typeof event.target.result === "string") {
+                    const geoJson = JSON.parse(event.target.result);
+
+                    // Handle both FeatureCollection and individual Feature
+                    if (
+                      geoJson.type === "FeatureCollection" &&
+                      geoJson.features
+                    ) {
+                      geoJson.features.forEach((feature: GeoJSON.Feature) => {
+                        geomanInstance.current!.features.importGeoJsonFeature(
+                          feature as GeoJsonImportFeature
+                        );
+                      });
+                      console.log(
+                        `Imported ${geoJson.features.length} features from ${file.name}`
+                      );
+                    } else if (geoJson.type === "Feature") {
+                      geomanInstance.current!.features.importGeoJsonFeature(
+                        geoJson
+                      );
+                      console.log(`Imported feature from ${file.name}`);
+                    } else {
+                      console.error("Invalid GeoJSON format");
+                    }
+                  }
+                } catch (error) {
+                  console.error("Error parsing GeoJSON file:", error);
+                }
+              };
+
+              reader.readAsText(file);
+            } else {
+              console.warn("Not a GeoJSON file:", file.name);
+            }
+          });
+        }
       };
 
       map.on("gm:loaded", () => {
         console.log("Geoman loaded", geoman);
         // Enable drawing tools
-        geoman.enableDraw("line");
+        //geoman.enableDraw("line");
         // Load demo shapes
-        loadDevShapes();
+        // loadDevShapes();
+
+        // Add drag and drop event listeners after Geoman is loaded
+        const container = map.getContainer();
+        container.addEventListener("dragover", handleDragOver);
+        container.addEventListener("drop", handleDrop);
       });
+
+      return () => {
+        if (mapInstance.current) {
+          const container = mapInstance.current.getContainer();
+          container.removeEventListener("dragover", handleDragOver);
+          container.removeEventListener("drop", handleDrop);
+          mapInstance.current.remove();
+        }
+      };
     }
 
     return () => {
