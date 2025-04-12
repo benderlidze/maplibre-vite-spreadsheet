@@ -11,6 +11,7 @@ import {
   loadGeoJSONFromStorage,
   saveGeoJSONToStorage,
 } from "../../helpers/localStorage";
+import { MapMenu } from "./MapMenu";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -23,20 +24,86 @@ export const GmMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<ml.Map | null>(null);
   const drawInstance = useRef<MapboxDraw | null>(null);
+
   const [currentStyle, setCurrentStyle] =
     useState<keyof typeof MAP_STYLES>("OSM");
   const [bounds, setBounds] = useState<[number, number][]>();
 
   console.log("bounds", bounds);
 
-  useEffect(() => {
-    if (bounds && mapInstance.current) {
-      mapInstance.current.fitBounds([bounds[0], bounds[1]], {
-        padding: 50,
-        maxZoom: 16,
-      });
+  // Handle opening GeoJSON files
+  const handleOpenGeoJSONFile = (files: File[]) => {
+    if (!drawInstance.current || !mapInstance.current) {
+      console.warn("Map or draw instance not loaded yet");
+      return;
     }
-  }, [bounds]);
+
+    files.forEach((file) => {
+      if (
+        file.type === "application/geo+json" ||
+        file.name.endsWith(".geojson") ||
+        file.name.endsWith(".json")
+      ) {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+          try {
+            if (event.target && typeof event.target.result === "string") {
+              const geoJson = JSON.parse(event.target.result);
+
+              // Handle both FeatureCollection and individual Feature
+              if (
+                (geoJson.type === "FeatureCollection" ||
+                  geoJson.type === "Feature") &&
+                geoJson.features
+              ) {
+                console.log(
+                  `Imported ${geoJson.features.length} features from ${file.name}`
+                );
+                // Add all features from the collection to the draw instance
+                drawInstance.current?.add(geoJson);
+
+                // Calculate bounds with TurfJS
+                if (geoJson.features.length > 0) {
+                  const bounds_ = bbox(geoJson);
+                  // Bounds from TurfJS are in [minX, minY, maxX, maxY] format
+                  // Convert to MapLibre bounds format [[minX, minY], [maxX, maxY]]
+                  mapInstance.current?.fitBounds(
+                    [
+                      [bounds_[0], bounds_[1]],
+                      [bounds_[2], bounds_[3]],
+                    ],
+                    { padding: 50, maxZoom: 16 }
+                  );
+
+                  setBounds([
+                    [bounds_[0], bounds_[1]],
+                    [bounds_[2], bounds_[3]],
+                  ]);
+                }
+
+                // Save to localStorage after adding to map
+                const allFeatures = drawInstance.current?.getAll();
+                if (allFeatures) {
+                  saveGeoJSONToStorage({
+                    data: allFeatures,
+                  });
+                }
+              } else {
+                console.error("Invalid GeoJSON format");
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing GeoJSON file:", error);
+          }
+        };
+
+        reader.readAsText(file);
+      } else {
+        console.warn("Not a GeoJSON file:", file.name);
+      }
+    });
+  };
 
   useEffect(() => {
     if (mapRef.current) {
@@ -82,79 +149,9 @@ export const GmMap: React.FC = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!drawInstance.current) {
-          console.warn("Geoman not loaded yet");
-          return;
-        }
-
         if (e.dataTransfer && e.dataTransfer.files) {
           const files = Array.from(e.dataTransfer.files);
-
-          files.forEach((file) => {
-            if (
-              file.type === "application/geo+json" ||
-              file.name.endsWith(".geojson") ||
-              file.name.endsWith(".json")
-            ) {
-              const reader = new FileReader();
-
-              reader.onload = (event) => {
-                try {
-                  if (event.target && typeof event.target.result === "string") {
-                    const geoJson = JSON.parse(event.target.result);
-
-                    // Handle both FeatureCollection and individual Feature
-                    if (
-                      (geoJson.type === "FeatureCollection" ||
-                        geoJson.type === "Feature") &&
-                      geoJson.features
-                    ) {
-                      console.log(
-                        `Imported ${geoJson.features.length} features from ${file.name}`
-                      );
-                      // Add all features from the collection to the draw instance
-                      drawInstance.current?.add(geoJson);
-
-                      // Calculate bounds with TurfJS
-                      if (geoJson.features.length > 0) {
-                        const bounds_ = bbox(geoJson);
-                        // Bounds from TurfJS are in [minX, minY, maxX, maxY] format
-                        // Convert to MapLibre bounds format [[minX, minY], [maxX, maxY]]
-                        mapInstance.current?.fitBounds(
-                          [
-                            [bounds_[0], bounds_[1]],
-                            [bounds_[2], bounds_[3]],
-                          ],
-                          { padding: 50, maxZoom: 16 }
-                        );
-
-                        setBounds([
-                          [bounds_[0], bounds_[1]],
-                          [bounds_[2], bounds_[3]],
-                        ]);
-                      }
-
-                      // Save to localStorage after adding to map
-                      const allFeatures = drawInstance.current?.getAll();
-                      if (allFeatures) {
-                        saveGeoJSONToStorage({
-                          data: allFeatures,
-                        });
-                      }
-                    } else {
-                      console.error("Invalid GeoJSON format");
-                    }
-                  }
-                } catch (error) {
-                  console.error("Error parsing GeoJSON file:", error);
-                }
-              };
-
-              reader.readAsText(file);
-            } else {
-              console.warn("Not a GeoJSON file:", file.name);
-            }
-          });
+          handleOpenGeoJSONFile(files);
         }
       };
 
@@ -176,13 +173,6 @@ export const GmMap: React.FC = () => {
           if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
             try {
               const bounds_ = bbox(savedGeoJSON);
-              mapInstance.current?.fitBounds(
-                [
-                  [bounds_[0], bounds_[1]],
-                  [bounds_[2], bounds_[3]],
-                ],
-                { padding: 50, maxZoom: 16 }
-              );
               setBounds([
                 [bounds_[0], bounds_[1]],
                 [bounds_[2], bounds_[3]],
@@ -234,7 +224,8 @@ export const GmMap: React.FC = () => {
   }, [currentStyle]);
 
   return (
-    <div className="flex flex-1 w-full h-full flex-row relative">
+    <div className="flex flex-1 w-full h-full flex-row ">
+      <MapMenu handleOpenGeoJSONFile={handleOpenGeoJSONFile} />
       <div
         id="dev-map"
         ref={mapRef}
@@ -249,7 +240,13 @@ export const GmMap: React.FC = () => {
         setCurrentStyle={setCurrentStyle}
       />
 
-      <div className="flex flex-col w-1/4 p-4 bg-gray-100">123</div>
+      <div className="flex flex-col w-1/4 p-4 bg-gray-100">
+        <textarea
+          name=""
+          id=""
+          defaultValue={JSON.stringify(drawInstance.current?.getAll())}
+        ></textarea>
+      </div>
     </div>
   );
 };
