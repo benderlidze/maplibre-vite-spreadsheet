@@ -8,6 +8,7 @@ import bbox from "@turf/bbox";
 import { MAP_STYLES } from "../../contants";
 import { MapStyleSwitcher } from "./MapStyleSwitcher";
 import {
+  clearGeoJSONFromStorage,
   loadGeoJSONFromStorage,
   saveGeoJSONToStorage,
 } from "../../helpers/localStorage";
@@ -20,14 +21,16 @@ MapboxDraw.constants.classes.CONTROL_PREFIX = "maplibregl-ctrl-";
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_GROUP = "maplibregl-ctrl-group";
 
+const defaultStyle = "Light";
+
 export const GmMap: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<ml.Map | null>(null);
   const drawInstance = useRef<MapboxDraw | null>(null);
 
   const [currentStyle, setCurrentStyle] =
-    useState<keyof typeof MAP_STYLES>("OSM");
-  const [bounds, setBounds] = useState<[number, number][]>();
+    useState<keyof typeof MAP_STYLES>(defaultStyle);
+  const [bounds, setBounds] = useState<[number, number][]>([]);
 
   console.log("bounds", bounds);
 
@@ -82,6 +85,7 @@ export const GmMap: React.FC = () => {
                   ]);
                 }
 
+                clearGeoJSONFromStorage(); // Clear previous data
                 // Save to localStorage after adding to map
                 const allFeatures = drawInstance.current?.getAll();
                 if (allFeatures) {
@@ -109,7 +113,7 @@ export const GmMap: React.FC = () => {
     if (mapRef.current) {
       const map = new ml.Map({
         container: mapRef.current,
-        style: MAP_STYLES[currentStyle],
+        style: MAP_STYLES[defaultStyle],
         center: [0, 0],
         zoom: 1,
         fadeDuration: 50,
@@ -165,6 +169,7 @@ export const GmMap: React.FC = () => {
 
         // Load GeoJSON data from localStorage when the map is ready
         const savedGeoJSON = loadGeoJSONFromStorage();
+        console.log("savedGeoJSON", savedGeoJSON);
         if (savedGeoJSON && drawInstance.current) {
           // Add features from localStorage to the map
           drawInstance.current.add(savedGeoJSON);
@@ -221,6 +226,12 @@ export const GmMap: React.FC = () => {
         mapInstance.current.remove();
       }
     };
+  }, []);
+
+  useEffect(() => {
+    if (mapInstance.current) {
+      mapInstance.current.setStyle(MAP_STYLES[currentStyle]);
+    }
   }, [currentStyle]);
 
   return (

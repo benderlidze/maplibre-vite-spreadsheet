@@ -18,9 +18,18 @@ export const saveGeoJSONToStorage = (storageData: storageData) => {
 export const loadGeoJSONFromStorage = () => {
   try {
     const data = localStorage.getItem(GEOJSON_STORAGE_KEY);
-    return data ? JSON.parse(data) : null;
+    return data ? JSON.parse(data).data : null;
   } catch (error) {
     console.error("Failed to load GeoJSON from localStorage:", error);
     return null;
+  }
+};
+
+export const clearGeoJSONFromStorage = () => {
+  try {
+    console.log("Clearing storage...");
+    localStorage.removeItem(GEOJSON_STORAGE_KEY);
+  } catch (error) {
+    console.error("Failed to clear GeoJSON from localStorage:", error);
   }
 };
