@@ -13,6 +13,8 @@ import {
   saveGeoJSONToStorage,
 } from "../../helpers/localStorage";
 import { MapMenu } from "./MapMenu";
+import { GeoJsonEditor } from "./GeoJsonEditor";
+import { Feature, FeatureCollection } from "geojson";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -31,6 +33,10 @@ export const GmMap: React.FC = () => {
   const [currentStyle, setCurrentStyle] =
     useState<keyof typeof MAP_STYLES>(defaultStyle);
   const [bounds, setBounds] = useState<[number, number][]>([]);
+  const [geoJSON, setGeoJSON] = useState<FeatureCollection | Feature>({
+    type: "FeatureCollection",
+    features: [],
+  });
 
   console.log("bounds", bounds);
 
@@ -190,26 +196,9 @@ export const GmMap: React.FC = () => {
       });
 
       // Save GeoJSON when features are created, updated or deleted
-      map.on("draw.create", () => {
-        if (drawInstance.current) {
-          const allFeatures = drawInstance.current.getAll();
-          saveGeoJSONToStorage({ data: allFeatures });
-        }
-      });
-
-      map.on("draw.update", () => {
-        if (drawInstance.current) {
-          const allFeatures = drawInstance.current.getAll();
-          saveGeoJSONToStorage({ data: allFeatures });
-        }
-      });
-
-      map.on("draw.delete", () => {
-        if (drawInstance.current) {
-          const allFeatures = drawInstance.current.getAll();
-          saveGeoJSONToStorage({ data: allFeatures });
-        }
-      });
+      map.on("draw.create", updateGeoJSON);
+      map.on("draw.update", updateGeoJSON);
+      map.on("draw.delete", updateGeoJSON);
 
       return () => {
         if (mapInstance.current) {
@@ -234,6 +223,14 @@ export const GmMap: React.FC = () => {
     }
   }, [currentStyle]);
 
+  function updateGeoJSON() {
+    if (drawInstance.current) {
+      const allFeatures = drawInstance.current.getAll();
+      setGeoJSON(allFeatures);
+      saveGeoJSONToStorage({ data: allFeatures });
+    }
+  }
+
   return (
     <div className="flex flex-1 w-full h-full flex-row ">
       <MapMenu handleOpenGeoJSONFile={handleOpenGeoJSONFile} />
@@ -251,12 +248,8 @@ export const GmMap: React.FC = () => {
         setCurrentStyle={setCurrentStyle}
       />
 
-      <div className="flex flex-col w-1/4 p-4 bg-gray-100">
-        <textarea
-          name=""
-          id=""
-          defaultValue={JSON.stringify(drawInstance.current?.getAll())}
-        ></textarea>
+      <div className="flex flex-col w-1/3 bg-gray-100">
+        <GeoJsonEditor geojson={geoJSON} onChange={() => {}} />
       </div>
     </div>
   );

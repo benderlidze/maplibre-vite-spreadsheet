@@ -13,8 +13,8 @@ export const MapStyleSwitcher = ({
     <div
       style={{
         position: "absolute",
-        bottom: "20px",
-        left: "20px",
+        bottom: "10px",
+        left: "10px",
         zIndex: 10,
         display: "flex",
         flexDirection: "row",
