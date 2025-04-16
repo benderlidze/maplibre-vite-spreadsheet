@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Feature, FeatureCollection } from "geojson";
 import { toKML } from "@placemarkio/tokml";
 import { saveAs } from "file-saver";
+import shpwrite, { DownloadOptions, ZipOptions } from "@mapbox/shp-write";
 
 type MapMenuProps = {
   handleOpenGeoJSONFile: (files: File[]) => void;
@@ -47,11 +48,13 @@ export const MapMenu: React.FC<MapMenuProps> = ({
     }
   };
 
-  const exportToFormat = (format: string) => {
+  const exportToFormat = async (format: string) => {
     if (!geojson) {
       alert("No data to export. Please load GeoJSON data first.");
       return;
     }
+
+    const filename = new Date().toISOString().split("T")[0]; // Use current date as filename
 
     // Ensure we're working with a FeatureCollection
     const featureCollection: FeatureCollection =
@@ -68,7 +71,8 @@ export const MapMenu: React.FC<MapMenuProps> = ({
         break;
       }
 
-      case "kml": { // Convert GeoJSON to KML using tokml
+      case "kml": {
+        // Convert GeoJSON to KML using tokml
         const kmlString = toKML(featureCollection);
         downloadFile(
           kmlString,
@@ -81,9 +85,30 @@ export const MapMenu: React.FC<MapMenuProps> = ({
       // Other formats can be implemented similarly
       case "topojson":
       case "csv":
-      case "shapefile":
         alert(`Export to ${format} format not implemented yet.`);
         break;
+
+      case "shapefile": {
+        try {
+          // Optional custom options passed to the underlying `zip` call
+          const options = {
+            outputType: "blob",
+            compression: "DEFLATE",
+          } as DownloadOptions & ZipOptions;
+
+          const zipData = (await shpwrite.zip(
+            featureCollection,
+            options
+          )) as Blob;
+          saveAs(zipData, filename);
+        } catch (error) {
+          console.error("Error during shapefile export process:", error);
+          alert(
+            "Error during shapefile export process. Check console for details."
+          );
+        }
+        break;
+      }
 
       default:
         alert(`Unknown export format: ${format}`);
