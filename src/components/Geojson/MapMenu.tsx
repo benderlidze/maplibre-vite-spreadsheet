@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
+import { Feature, FeatureCollection } from "geojson";
+import { toKML } from "@placemarkio/tokml";
+import { saveAs } from "file-saver";
 
 type MapMenuProps = {
   handleOpenGeoJSONFile: (files: File[]) => void;
+  geojson?: FeatureCollection | Feature;
 };
 
-export const MapMenu: React.FC<MapMenuProps> = ({ handleOpenGeoJSONFile }) => {
+export const MapMenu: React.FC<MapMenuProps> = ({
+  handleOpenGeoJSONFile,
+  geojson,
+}) => {
   const [isSaveMenuOpen, setIsSaveMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +45,62 @@ export const MapMenu: React.FC<MapMenuProps> = ({ handleOpenGeoJSONFile }) => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+  };
+
+  const exportToFormat = (format: string) => {
+    if (!geojson) {
+      alert("No data to export. Please load GeoJSON data first.");
+      return;
+    }
+
+    // Ensure we're working with a FeatureCollection
+    const featureCollection: FeatureCollection =
+      "type" in geojson && geojson.type === "Feature"
+        ? { type: "FeatureCollection", features: [geojson as Feature] }
+        : (geojson as FeatureCollection);
+
+    console.log("geojson", geojson);
+
+    switch (format) {
+      case "geojson": {
+        const geojsonString = JSON.stringify(featureCollection, null, 2);
+        downloadFile(geojsonString, "export.geojson", "application/json");
+        break;
+      }
+
+      case "kml": { // Convert GeoJSON to KML using tokml
+        const kmlString = toKML(featureCollection);
+        downloadFile(
+          kmlString,
+          "export.kml",
+          "application/vnd.google-earth.kml+xml"
+        );
+        break;
+      }
+
+      // Other formats can be implemented similarly
+      case "topojson":
+      case "csv":
+      case "shapefile":
+        alert(`Export to ${format} format not implemented yet.`);
+        break;
+
+      default:
+        alert(`Unknown export format: ${format}`);
+    }
+
+    // Close the menu after exporting
+    setIsSaveMenuOpen(false);
+  };
+
+  // Helper function for file downloads
+  const downloadFile = (
+    content: string,
+    filename: string,
+    contentType: string
+  ) => {
+    const blob = new Blob([content], { type: contentType });
+    saveAs(blob, filename);
   };
 
   return (
@@ -88,20 +151,42 @@ export const MapMenu: React.FC<MapMenuProps> = ({ handleOpenGeoJSONFile }) => {
               <ul className="py-1">
                 <li
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => {}}
+                  onClick={() => {
+                    exportToFormat("geojson");
+                  }}
                 >
                   GeoJSON
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    exportToFormat("topojson");
+                  }}
+                >
                   TopoJSON
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    exportToFormat("csv");
+                  }}
+                >
                   CSV
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    exportToFormat("shapefile");
+                  }}
+                >
                   Shapefile
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                <li
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => {
+                    exportToFormat("kml");
+                  }}
+                >
                   KML
                 </li>
               </ul>

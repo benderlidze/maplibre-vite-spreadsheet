@@ -233,7 +233,10 @@ export const GmMap: React.FC = () => {
 
   return (
     <div className="flex flex-1 w-full h-full flex-row ">
-      <MapMenu handleOpenGeoJSONFile={handleOpenGeoJSONFile} />
+      <MapMenu
+        handleOpenGeoJSONFile={handleOpenGeoJSONFile}
+        geojson={geoJSON}
+      />
       <div
         id="dev-map"
         ref={mapRef}
