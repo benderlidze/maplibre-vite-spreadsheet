@@ -252,7 +252,7 @@ export const GmMap: React.FC = () => {
 
   useEffect(() => {
     if (mapInstance.current) {
-      mapInstance.current.setStyle(MAP_STYLES[currentStyle]);
+      mapInstance.current.setStyle(MAP_STYLES[currentStyle], { diff: false });
     }
   }, [currentStyle]);
 
