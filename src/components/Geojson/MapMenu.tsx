@@ -91,9 +91,64 @@ export const MapMenu: React.FC<MapMenuProps> = ({
         break;
       }
 
-      case "csv":
-        alert(`Export to ${format} format not implemented yet.`);
+      case "csv": {
+        // Start by collecting headers and rowsalert(`Export to ${format} format not implemented yet.`);
+        const headers = new Set<string>(["lng", "lat"]);
+        const rows: Record<string, string>[] = [];
+
+        // Process each feature
+        featureCollection.features.forEach((feature) => {
+          // Skip non-point features
+          if (feature.geometry.type !== "Point") {
+            console.warn("Skipping non-point feature in CSV export");
+            return;
+          }
+
+          const [lng, lat] = feature.geometry.coordinates;
+          const row: Record<string, string> = {
+            lng: lng.toString(),
+            lat: lat.toString(),
+          };
+
+          // Add all properties as columns
+          if (feature.properties) {
+            Object.entries(feature.properties).forEach(([key, value]) => {
+              headers.add(key);
+              row[key] =
+                value !== null && value !== undefined ? String(value) : "";
+            });
+          }
+
+          rows.push(row);
+        });
+
+        if (rows.length === 0) {
+          alert("No point features found for CSV export.");
+          return;
+        }
+
+        // Convert to CSV string
+        const headerArray = Array.from(headers);
+        const csvContent = [
+          // Header row
+          headerArray.join(","),
+          // Data rows
+          ...rows.map((row) =>
+            headerArray
+              .map((header) => {
+                const val = row[header] || "";
+                // Quote values with commas or quotes
+                return val.includes(",") || val.includes('"')
+                  ? `"${val.replace(/"/g, '""')}"`
+                  : val;
+              })
+              .join(",")
+          ),
+        ].join("\n");
+
+        downloadFile(csvContent, `export.csv`, "text/csv");
         break;
+      }
 
       case "shapefile": {
         try {
