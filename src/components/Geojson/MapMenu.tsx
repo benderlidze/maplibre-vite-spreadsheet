@@ -3,6 +3,7 @@ import { Feature, FeatureCollection } from "geojson";
 import { toKML } from "@placemarkio/tokml";
 import { saveAs } from "file-saver";
 import shpwrite, { DownloadOptions, ZipOptions } from "@mapbox/shp-write";
+import { topology } from "topojson-server";
 
 type MapMenuProps = {
   handleOpenGeoJSONFile: (files: File[]) => void;
@@ -82,8 +83,14 @@ export const MapMenu: React.FC<MapMenuProps> = ({
         break;
       }
 
-      // Other formats can be implemented similarly
-      case "topojson":
+      case "topojson": {
+        // Convert GeoJSON to TopoJSON using topojson-server
+        const topoData = topology({ collection: featureCollection });
+        const topoString = JSON.stringify(topoData, null, 2);
+        downloadFile(topoString, "export.topojson", "application/json");
+        break;
+      }
+
       case "csv":
         alert(`Export to ${format} format not implemented yet.`);
         break;
