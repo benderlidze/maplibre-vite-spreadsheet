@@ -187,7 +187,6 @@ export const GmMap: React.FC = () => {
                 console.log("savedGeoJSON.features", savedGeoJSON.features);
                 try {
                   const bounds_ = bbox(savedGeoJSON);
-                  console.log("bounds_", bounds_);
                   setBounds([
                     [bounds_[0], bounds_[1]],
                     [bounds_[2], bounds_[3]],
@@ -198,6 +197,7 @@ export const GmMap: React.FC = () => {
                     error
                   );
                 }
+                updateGeoJSON(); // Update the GeoJSON state
               }
             }
           } else {
@@ -209,30 +209,10 @@ export const GmMap: React.FC = () => {
         const container = map.getContainer();
         container.addEventListener("dragover", handleDragOver);
         container.addEventListener("drop", handleDrop);
-
-        // // Load GeoJSON data from localStorage when the map is ready
-        // const savedGeoJSON = loadGeoJSONFromStorage();
-        // console.log("savedGeoJSON", savedGeoJSON);
-        // if (savedGeoJSON && drawInstance.current) {
-        //   // Add features from localStorage to the map
-        //   drawInstance.current.add(savedGeoJSON);
-
-        //   // If there are features, fit the map to their bounds
-        //   if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
-        //     try {
-        //       const bounds_ = bbox(savedGeoJSON);
-        //       setBounds([
-        //         [bounds_[0], bounds_[1]],
-        //         [bounds_[2], bounds_[3]],
-        //       ]);
-        //     } catch (error) {
-        //       console.error("Error fitting bounds to saved features:", error);
-        //     }
-        //   }
-        // }
       });
 
       // Save GeoJSON when features are created, updated or deleted
+
       map.on("draw.create", updateGeoJSON);
       map.on("draw.update", updateGeoJSON);
       map.on("draw.delete", updateGeoJSON);
@@ -277,12 +257,27 @@ export const GmMap: React.FC = () => {
   }, [currentStyle]);
 
   function updateGeoJSON() {
+    console.log("updateGeoJSON1");
     if (drawInstance.current) {
+      console.log("updateGeoJSON2");
       const allFeatures = drawInstance.current.getAll();
       setGeoJSON(allFeatures);
       saveGeoJSONToStorage({ data: allFeatures });
     }
   }
+
+  const onEditorChange = (value: string) => {
+    try {
+      const parsedGeoJSON = JSON.parse(value);
+      if (parsedGeoJSON && drawInstance.current) {
+        drawInstance.current.set(parsedGeoJSON);
+        setGeoJSON(parsedGeoJSON);
+        saveGeoJSONToStorage({ data: parsedGeoJSON });
+      }
+    } catch (error) {
+      console.error("Error parsing GeoJSON:", error);
+    }
+  };
 
   return (
     <div className="flex flex-1 w-full h-full flex-row ">
@@ -305,7 +300,7 @@ export const GmMap: React.FC = () => {
       />
 
       <div className="flex flex-col w-1/3 bg-gray-100">
-        <GeoJsonEditor geojson={geoJSON} onChange={() => {}} />
+        <GeoJsonEditor geojson={geoJSON} onChange={onEditorChange} />
       </div>
     </div>
   );
