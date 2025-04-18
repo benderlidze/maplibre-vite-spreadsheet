@@ -8,6 +8,7 @@ import bbox from "@turf/bbox";
 import { MAP_STYLES } from "../../contants";
 import { MapStyleSwitcher } from "./MapStyleSwitcher";
 import {
+  checkLocalStorage,
   clearGeoJSONFromStorage,
   loadGeoJSONFromStorage,
   saveGeoJSONToStorage,
@@ -168,31 +169,67 @@ export const GmMap: React.FC = () => {
       map.on("load", () => {
         console.log("drawInstance loaded", drawInstance);
 
+        const isStorageDataAvailable = checkLocalStorage();
+        if (isStorageDataAvailable) {
+          //ask if you want to use it with popup
+          const useStorage = window.confirm(
+            "Do you want to use the saved data?"
+          );
+          if (useStorage) {
+            const savedGeoJSON = loadGeoJSONFromStorage();
+            console.log("savedGeoJSON", savedGeoJSON);
+            if (savedGeoJSON && drawInstance.current) {
+              // Add features from localStorage to the map
+              drawInstance.current.add(savedGeoJSON);
+
+              // If there are features, fit the map to their bounds
+              if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
+                console.log("savedGeoJSON.features", savedGeoJSON.features);
+                try {
+                  const bounds_ = bbox(savedGeoJSON);
+                  console.log("bounds_", bounds_);
+                  setBounds([
+                    [bounds_[0], bounds_[1]],
+                    [bounds_[2], bounds_[3]],
+                  ]);
+                } catch (error) {
+                  console.error(
+                    "Error fitting bounds to saved features:",
+                    error
+                  );
+                }
+              }
+            }
+          } else {
+            clearGeoJSONFromStorage();
+          }
+        }
+
         // Add drag and drop event listeners after Geoman is loaded
         const container = map.getContainer();
         container.addEventListener("dragover", handleDragOver);
         container.addEventListener("drop", handleDrop);
 
-        // Load GeoJSON data from localStorage when the map is ready
-        const savedGeoJSON = loadGeoJSONFromStorage();
-        console.log("savedGeoJSON", savedGeoJSON);
-        if (savedGeoJSON && drawInstance.current) {
-          // Add features from localStorage to the map
-          drawInstance.current.add(savedGeoJSON);
+        // // Load GeoJSON data from localStorage when the map is ready
+        // const savedGeoJSON = loadGeoJSONFromStorage();
+        // console.log("savedGeoJSON", savedGeoJSON);
+        // if (savedGeoJSON && drawInstance.current) {
+        //   // Add features from localStorage to the map
+        //   drawInstance.current.add(savedGeoJSON);
 
-          // If there are features, fit the map to their bounds
-          if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
-            try {
-              const bounds_ = bbox(savedGeoJSON);
-              setBounds([
-                [bounds_[0], bounds_[1]],
-                [bounds_[2], bounds_[3]],
-              ]);
-            } catch (error) {
-              console.error("Error fitting bounds to saved features:", error);
-            }
-          }
-        }
+        //   // If there are features, fit the map to their bounds
+        //   if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
+        //     try {
+        //       const bounds_ = bbox(savedGeoJSON);
+        //       setBounds([
+        //         [bounds_[0], bounds_[1]],
+        //         [bounds_[2], bounds_[3]],
+        //       ]);
+        //     } catch (error) {
+        //       console.error("Error fitting bounds to saved features:", error);
+        //     }
+        //   }
+        // }
       });
 
       // Save GeoJSON when features are created, updated or deleted
@@ -216,6 +253,22 @@ export const GmMap: React.FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (mapInstance.current && bounds.length > 0) {
+      const [[minX, minY], [maxX, maxY]] = bounds;
+      mapInstance.current.fitBounds(
+        [
+          [minX, minY],
+          [maxX, maxY],
+        ],
+        {
+          padding: 10,
+          maxZoom: 16,
+        }
+      );
+    }
+  }, [bounds]);
 
   useEffect(() => {
     if (mapInstance.current) {

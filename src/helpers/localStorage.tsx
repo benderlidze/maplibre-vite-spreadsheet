@@ -15,6 +15,16 @@ export const saveGeoJSONToStorage = (storageData: storageData) => {
   }
 };
 
+export const checkLocalStorage = () => {
+  try {
+    const data = localStorage.getItem(GEOJSON_STORAGE_KEY);
+    return data !== null;
+  } catch (error) {
+    console.error("Error checking LocalStorage availability:", error);
+    return false;
+  }
+};
+
 export const loadGeoJSONFromStorage = () => {
   try {
     const data = localStorage.getItem(GEOJSON_STORAGE_KEY);
