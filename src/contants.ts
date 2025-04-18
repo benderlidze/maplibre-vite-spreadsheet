@@ -13,6 +13,8 @@ export const MAP_STYLES = {
         type: "raster",
         tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
         tileSize: 256,
+        attribution:
+          '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       },
     },
     layers: [
@@ -20,6 +22,28 @@ export const MAP_STYLES = {
         id: "osm-layer",
         type: "raster",
         source: "osm",
+      },
+    ],
+  } as StyleSpecification,
+  "Esri World": {
+    version: 8,
+    glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+    sources: {
+      esri: {
+        type: "raster",
+        tiles: [
+          "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        ],
+        tileSize: 256,
+        attribution:
+          'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">ArcGIS</a>',
+      },
+    },
+    layers: [
+      {
+        id: "esri-layer",
+        type: "raster",
+        source: "esri",
       },
     ],
   } as StyleSpecification,
