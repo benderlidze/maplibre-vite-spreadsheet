@@ -1,6 +1,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import ml from "maplibre-gl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { drawStyles } from "./drawStyles";
@@ -279,11 +279,19 @@ export const GmMap: React.FC = () => {
     }
   };
 
+  const getGeoJSONData = useCallback(() => {
+    if (drawInstance.current) {
+      const allFeatures = drawInstance.current.getAll();
+      return allFeatures;
+    }
+    return undefined;
+  }, []);
+
   return (
     <div className="flex flex-1 w-full h-full flex-row ">
       <MapMenu
         handleOpenGeoJSONFile={handleOpenGeoJSONFile}
-        geojson={geoJSON}
+        getGeoJSONData={getGeoJSONData}
       />
       <div
         id="dev-map"

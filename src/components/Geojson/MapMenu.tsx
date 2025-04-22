@@ -7,12 +7,12 @@ import { topology } from "topojson-server";
 
 type MapMenuProps = {
   handleOpenGeoJSONFile: (files: File[]) => void;
-  geojson?: FeatureCollection | Feature;
+  getGeoJSONData: (format: string) => Feature | FeatureCollection | undefined;
 };
 
 export const MapMenu: React.FC<MapMenuProps> = ({
   handleOpenGeoJSONFile,
-  geojson,
+  getGeoJSONData,
 }) => {
   const [isSaveMenuOpen, setIsSaveMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -50,6 +50,8 @@ export const MapMenu: React.FC<MapMenuProps> = ({
   };
 
   const exportToFormat = async (format: string) => {
+    const geojson = getGeoJSONData ? getGeoJSONData(format) : null;
+
     if (!geojson) {
       alert("No data to export. Please load GeoJSON data first.");
       return;
@@ -192,6 +194,7 @@ export const MapMenu: React.FC<MapMenuProps> = ({
 
   return (
     <div className="absolute z-10 bg-white bg-opacity-90 text-gray-800 p-2 shadow-md rounded">
+      {new Date().toISOString()}
       {/* Single file input with combined accept types */}
       <input
         type="file"
