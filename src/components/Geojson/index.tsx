@@ -39,8 +39,6 @@ export const GmMap: React.FC = () => {
     features: [],
   });
 
-  console.log("bounds", bounds);
-
   // Handle opening GeoJSON files
   const handleOpenGeoJSONFile = (files: File[]) => {
     if (!drawInstance.current || !mapInstance.current) {
@@ -217,6 +215,9 @@ export const GmMap: React.FC = () => {
       map.on("draw.update", updateGeoJSON);
       map.on("draw.delete", updateGeoJSON);
 
+      // map.on("draw.selectionchange", updateGeoJSON);
+      // map.on("draw.modechange", updateGeoJSON);
+
       return () => {
         if (mapInstance.current) {
           const container = mapInstance.current.getContainer();
@@ -282,13 +283,14 @@ export const GmMap: React.FC = () => {
   const getGeoJSONData = () => {
     if (drawInstance.current) {
       const allFeatures = drawInstance.current.getAll();
+      console.log("drawInstance.current", drawInstance.current);
       return allFeatures;
     }
     return undefined;
   };
 
   return (
-    <div className="flex flex-1 w-full h-full flex-row ">
+    <div className="flex flex-1 w-full h-full flex-col md:flex-row relative">
       <MapMenu
         handleOpenGeoJSONFile={handleOpenGeoJSONFile}
         getGeoJSONData={getGeoJSONData}
@@ -296,9 +298,9 @@ export const GmMap: React.FC = () => {
       <div
         id="dev-map"
         ref={mapRef}
+        className="h-[60vh] md:h-full md:flex-1"
         style={{
-          height: "100%",
-          flex: 1,
+          width: "100%",
         }}
       ></div>
 
@@ -307,7 +309,10 @@ export const GmMap: React.FC = () => {
         setCurrentStyle={setCurrentStyle}
       />
 
-      <div className="flex flex-col w-1/3 bg-gray-100">
+      <div
+        className={`flex flex-col w-full md:w-1/3 bg-gray-100 transition-all duration-300
+           h-1/3 md:h-full   `}
+      >
         <GeoJsonEditor geojson={geoJSON} onChange={onEditorChange} />
       </div>
     </div>

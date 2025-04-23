@@ -10,33 +10,16 @@ export const MapStyleSwitcher = ({
   setCurrentStyle,
 }: MapStyleSwitcherProps) => {
   return (
-    <div
-      style={{
-        position: "absolute",
-        bottom: "10px",
-        left: "10px",
-        zIndex: 10,
-        display: "flex",
-        flexDirection: "row",
-        gap: "4px",
-        padding: "5px",
-        backgroundColor: "rgba(255, 255, 255, 0.7)",
-        borderRadius: "4px",
-      }}
-    >
+    <div className="absolute bottom-2.5 left-2.5 z-10 flex flex-row gap-1 ">
       {Object.keys(MAP_STYLES).map((styleName) => (
         <button
           key={styleName}
           onClick={() => setCurrentStyle(styleName as keyof typeof MAP_STYLES)}
-          style={{
-            padding: "5px 10px",
-            cursor: "pointer",
-            fontSize: "12px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            backgroundColor: currentStyle === styleName ? "#4285F4" : "#fff",
-            color: currentStyle === styleName ? "#fff" : "#333",
-          }}
+          className={`px-2 py-1.5 cursor-pointer text-xs rounded border whitespace-nowrap ${
+            currentStyle === styleName
+              ? "bg-blue-500 text-white border-blue-500"
+              : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"
+          }`}
         >
           {styleName}
         </button>
