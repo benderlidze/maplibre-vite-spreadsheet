@@ -9,8 +9,9 @@ type GeoJsonEditorProps = {
 };
 
 export function GeoJsonEditor({ geojson, onChange }: GeoJsonEditorProps) {
+  console.log("GeoJsonEditor", geojson);
   return (
-    <div className="h-full w-full relative">
+    <div className="min-h-96 h-full w-full relative">
       <CodeMirror
         value={JSON.stringify(geojson, null, 2)}
         style={{

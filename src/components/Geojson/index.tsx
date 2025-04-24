@@ -287,6 +287,7 @@ export const GmMap: React.FC = () => {
 
   const onEditorChange = (value: string) => {
     try {
+      console.log("value", value);
       const parsedGeoJSON = JSON.parse(value);
       if (parsedGeoJSON && drawInstance.current) {
         drawInstance.current.set(parsedGeoJSON);

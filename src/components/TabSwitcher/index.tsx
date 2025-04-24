@@ -17,7 +17,7 @@ export const TabSwitcher = ({ tabs }: TabSwitcherProps) => {
   }
 
   return (
-    <div className="w-full flex flex-col rounded-lg overflow-hidden  bg-white">
+    <div className="h-full w-full flex flex-col rounded-lg overflow-hidden  bg-white">
       <div className="flex bg-gray-50 border-b border-gray-200">
         {tabs.map((tab, index) => (
           <button
@@ -33,7 +33,7 @@ export const TabSwitcher = ({ tabs }: TabSwitcherProps) => {
           </button>
         ))}
       </div>
-      <div>{tabs[activeTab].component}</div>
+      <div className="h-full w-full">{tabs[activeTab].component}</div>
     </div>
   );
 };
