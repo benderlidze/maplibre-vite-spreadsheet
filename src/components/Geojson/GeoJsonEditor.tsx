@@ -4,7 +4,7 @@ import { EditorView } from "@codemirror/view";
 import { Feature, FeatureCollection } from "geojson";
 
 type GeoJsonEditorProps = {
-  geojson?: FeatureCollection | Feature;
+  geojson?: FeatureCollection | Feature | null;
   onChange: (value: string) => void;
 };
 

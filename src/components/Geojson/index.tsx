@@ -14,8 +14,11 @@ import {
   saveGeoJSONToStorage,
 } from "../../helpers/localStorage";
 import { MapMenu } from "./MapMenu";
+// import { GeoJsonEditor } from "./GeoJsonEditor";
+import { Feature, GeoJsonProperties, Geometry } from "geojson";
+import { PropertyInspector } from "./PropertyInspectro";
 import { GeoJsonEditor } from "./GeoJsonEditor";
-import { Feature, FeatureCollection } from "geojson";
+import { TabSwitcher } from "../TabSwitcher";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -34,10 +37,9 @@ export const GmMap: React.FC = () => {
   const [currentStyle, setCurrentStyle] =
     useState<keyof typeof MAP_STYLES>(defaultStyle);
   const [bounds, setBounds] = useState<[number, number][]>([]);
-  const [geoJSON, setGeoJSON] = useState<FeatureCollection | Feature>({
-    type: "FeatureCollection",
-    features: [],
-  });
+  const [selectedGeometry, setSelectedGeometry] = useState<
+    Feature<Geometry, GeoJsonProperties> | undefined | null
+  >();
 
   // Handle opening GeoJSON files
   const handleOpenGeoJSONFile = (files: File[]) => {
@@ -215,8 +217,24 @@ export const GmMap: React.FC = () => {
       map.on("draw.update", updateGeoJSON);
       map.on("draw.delete", updateGeoJSON);
 
-      // map.on("draw.selectionchange", updateGeoJSON);
-      // map.on("draw.modechange", updateGeoJSON);
+      // Handle selection changes
+      map.on("draw.selectionchange", (e) => {
+        console.log("Selection changed", e);
+
+        if (drawInstance.current) {
+          const selectedFeatures = drawInstance.current.getSelectedIds();
+          console.log("Selected feature IDs:", selectedFeatures);
+
+          if (selectedFeatures.length > 0) {
+            // Get the first selected feature (you can modify this to handle multiple selections)
+            const featureData = drawInstance.current.get(selectedFeatures[0]);
+            setSelectedGeometry(featureData);
+            console.log("Selected feature data:", featureData);
+          } else {
+            setSelectedGeometry(null);
+          }
+        }
+      });
 
       return () => {
         if (mapInstance.current) {
@@ -262,7 +280,7 @@ export const GmMap: React.FC = () => {
     if (drawInstance.current) {
       console.log("updateGeoJSON2");
       const allFeatures = drawInstance.current.getAll();
-      setGeoJSON(allFeatures);
+      // setGeoJSON(allFeatures);
       saveGeoJSONToStorage({ data: allFeatures });
     }
   }
@@ -272,7 +290,7 @@ export const GmMap: React.FC = () => {
       const parsedGeoJSON = JSON.parse(value);
       if (parsedGeoJSON && drawInstance.current) {
         drawInstance.current.set(parsedGeoJSON);
-        setGeoJSON(parsedGeoJSON);
+        // setGeoJSON(parsedGeoJSON);
         saveGeoJSONToStorage({ data: parsedGeoJSON });
       }
     } catch (error) {
@@ -309,11 +327,29 @@ export const GmMap: React.FC = () => {
         setCurrentStyle={setCurrentStyle}
       />
 
-      <div
-        className={`flex flex-col w-full md:w-1/3 bg-gray-100 transition-all duration-300
-           h-1/3 md:h-full   `}
-      >
-        <GeoJsonEditor geojson={geoJSON} onChange={onEditorChange} />
+      <div className={`flex flex-col w-full md:w-1/3 h-1/3 md:h-full   `}>
+        <TabSwitcher
+          tabs={[
+            {
+              tabName: "GeoJSON Editor",
+              component: (
+                <GeoJsonEditor
+                  geojson={selectedGeometry}
+                  onChange={onEditorChange}
+                />
+              ),
+            },
+            {
+              tabName: "Properties",
+              component: (
+                <PropertyInspector
+                  geojson={selectedGeometry}
+                  onChange={onEditorChange}
+                />
+              ),
+            },
+          ]}
+        />
       </div>
     </div>
   );
