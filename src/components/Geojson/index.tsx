@@ -389,7 +389,7 @@ export const GmMap: React.FC = () => {
               ),
             },
             {
-              tabName: "Objects",
+              tabName: "All objects",
               component: (
                 <ObjectsList
                   geojson={memoizedGeoJsonData}

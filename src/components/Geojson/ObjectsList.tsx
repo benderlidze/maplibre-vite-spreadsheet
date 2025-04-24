@@ -35,12 +35,12 @@ export const ObjectsList = ({ geojson, onItemClick }: ObjectsListProps) => {
   const featuresWithProperties = useMemo(() => extractProperties(), [geojson]);
 
   return (
-    <div className="p-6 flex flex-col">
-      <div className="flex-1 overflow-y-auto min-h-0 max-h-[calc(100vh-10rem)]">
+    <div className="flex flex-col">
+      <div className="flex flex-col flex-1 overflow-y-auto min-h-0 max-h-[calc(100vh-10rem)] gap-4 p-4">
         {featuresWithProperties.length > 0 ? (
           featuresWithProperties.map((feature) => (
-            <section key={feature.id} className="mb-6">
-              <div className="overflow-x-auto bg-white rounded-md border border-gray-200">
+            <section key={feature.id}>
+              <div className="overflow-x-auto bg-white rounded-md border border-gray-200 ">
                 <table className="min-w-full text-left text-sm">
                   <tbody>
                     <tr className="bg-gray-100 border-b border-gray-200">
