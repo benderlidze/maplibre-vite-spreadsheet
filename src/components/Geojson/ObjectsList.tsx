@@ -15,17 +15,19 @@ export const ObjectsList = ({ geojson, onItemClick }: ObjectsListProps) => {
       geojson.type === "FeatureCollection" &&
       geojson.features
     ) {
-      return geojson.features.map((feature, idx) => ({
+      const props = geojson.features.map((feature, idx) => ({
         id: feature.id || `feature-${idx}`,
         properties: feature.properties || {},
+        geometryType: feature.geometry?.type || "Unknown",
       }));
+      return props;
     } else if ("type" in geojson && geojson.type === "Feature") {
-      return [
-        {
-          id: geojson.id || "feature-0",
-          properties: geojson.properties || {},
-        },
-      ];
+      const props = {
+        id: geojson.id || "feature-0",
+        properties: geojson.properties || {},
+        geometryType: geojson.geometry?.type || "Unknown",
+      };
+      return [props];
     }
     return [];
   };
@@ -38,19 +40,26 @@ export const ObjectsList = ({ geojson, onItemClick }: ObjectsListProps) => {
         {featuresWithProperties.length > 0 ? (
           featuresWithProperties.map((feature) => (
             <section key={feature.id} className="mb-6">
-              {featuresWithProperties.length > 1 && (
-                <small
-                  className="mb-2 text-sm font-medium text-blue-500 underline cursor-pointer whitespace-nowrap"
-                  onClick={() => {
-                    onItemClick(feature.id as string);
-                  }} // onItemClick(feature)}
-                >
-                  id: {feature.id}
-                </small>
-              )}
               <div className="overflow-x-auto bg-white rounded-md border border-gray-200">
                 <table className="min-w-full text-left text-sm">
                   <tbody>
+                    <tr className="bg-gray-100 border-b border-gray-200">
+                      <th
+                        className="px-4 py-2 font-medium text-gray-700 text-xs underline cursor-pointer"
+                        colSpan={2}
+                        onClick={() => onItemClick(feature.id as string)}
+                      >
+                        {feature.id.toString().slice(0, 30)}...
+                      </th>
+                    </tr>
+                    <tr className="bg-blue-50">
+                      <td className="px-4 py-2 font-mono text-xs text-blue-600">
+                        Type
+                      </td>
+                      <td className="px-4 py-2 font-mono text-xs text-blue-800">
+                        {feature.geometryType}
+                      </td>
+                    </tr>
                     {Object.entries(feature.properties)
                       .splice(0, 3)
                       .map(([key, value], idx) => (
@@ -61,18 +70,10 @@ export const ObjectsList = ({ geojson, onItemClick }: ObjectsListProps) => {
                             hover:bg-gray-100
                           `}
                         >
-                          <td
-                            className="px-4 py-2 font-mono text-gray-700"
-                            contentEditable
-                            suppressContentEditableWarning
-                          >
+                          <td className="px-4 py-2 font-mono text-gray-700">
                             {key}
                           </td>
-                          <td
-                            className="px-4 py-2 font-mono text-gray-800"
-                            contentEditable
-                            suppressContentEditableWarning
-                          >
+                          <td className="px-4 py-2 font-mono text-gray-800">
                             {typeof value === "object"
                               ? JSON.stringify(value)
                               : String(value)}
@@ -93,4 +94,3 @@ export const ObjectsList = ({ geojson, onItemClick }: ObjectsListProps) => {
     </div>
   );
 };
-

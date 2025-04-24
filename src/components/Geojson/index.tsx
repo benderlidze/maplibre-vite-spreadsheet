@@ -337,7 +337,8 @@ export const GmMap: React.FC = () => {
               [featureBounds[0], featureBounds[1]],
               [featureBounds[2], featureBounds[3]],
             ],
-            { padding: 50, maxZoom: 16 }
+            { padding: 50, maxZoom: 16 },
+            { animate: true, duration: 100 }
           );
         } catch (error) {
           console.error("Error fitting bounds to feature:", error);
