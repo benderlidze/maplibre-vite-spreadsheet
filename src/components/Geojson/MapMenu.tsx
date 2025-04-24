@@ -153,6 +153,7 @@ export const MapMenu: React.FC<MapMenuProps> = ({
       }
 
       case "shapefile": {
+        console.log("featureCollection", featureCollection);
         try {
           // Optional custom options passed to the underlying `zip` call
           const options = {

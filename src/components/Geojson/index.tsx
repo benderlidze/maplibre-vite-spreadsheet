@@ -1,6 +1,12 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import ml from "maplibre-gl";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { drawStyles } from "./drawStyles";
@@ -19,6 +25,7 @@ import { Feature, GeoJsonProperties, Geometry } from "geojson";
 import { PropertyInspector } from "./PropertyInspectro";
 import { GeoJsonEditor } from "./GeoJsonEditor";
 import { TabSwitcher } from "../TabSwitcher";
+import { ObjectsList } from "./ObjectsList";
 
 // @ts-expect-error ignore
 MapboxDraw.constants.classes.CONTROL_BASE = "maplibregl-ctrl";
@@ -308,6 +315,37 @@ export const GmMap: React.FC = () => {
     return undefined;
   };
 
+  const memoizedGeoJsonData = useMemo(() => {
+    return drawInstance.current?.getAll();
+  }, [drawInstance.current?.getAll()]);
+
+  const handleItemClick = useCallback((itemId: string) => {
+    console.log("item", itemId);
+    if (drawInstance.current && itemId) {
+      drawInstance.current.changeMode("simple_select" as string, {
+        featureIds: [itemId],
+      });
+
+      const featureData = drawInstance.current.get(itemId);
+      setSelectedGeometry(featureData);
+
+      if (featureData && mapInstance.current) {
+        try {
+          const featureBounds = bbox(featureData);
+          mapInstance.current.fitBounds(
+            [
+              [featureBounds[0], featureBounds[1]],
+              [featureBounds[2], featureBounds[3]],
+            ],
+            { padding: 50, maxZoom: 16 }
+          );
+        } catch (error) {
+          console.error("Error fitting bounds to feature:", error);
+        }
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-1 w-full h-full flex-col md:flex-row relative">
       <MapMenu
@@ -346,6 +384,15 @@ export const GmMap: React.FC = () => {
                 <PropertyInspector
                   geojson={selectedGeometry}
                   onChange={onEditorChange}
+                />
+              ),
+            },
+            {
+              tabName: "Objects",
+              component: (
+                <ObjectsList
+                  geojson={memoizedGeoJsonData}
+                  onItemClick={handleItemClick}
                 />
               ),
             },
