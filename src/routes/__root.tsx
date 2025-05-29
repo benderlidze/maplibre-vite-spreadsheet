@@ -13,8 +13,19 @@ const RootComponent = () => {
   const hideMenu = location.pathname.startsWith("/map");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const DonateButton = () => (
+    <a
+      href="https://ko-fi.com/geomapi"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-[#d9534f] text-white rounded-md px-4 py-2 text-sm hover:bg-[#c9302c] transition-colors"
+    >
+      Donate ❤️
+    </a>
+  );
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen ">
       {!hideMenu && (
         <>
           <nav
@@ -29,6 +40,8 @@ const RootComponent = () => {
                 </div>
               </div>
             </Link>
+
+            <DonateButton />
 
             {/* Mobile menu button */}
             <button
@@ -62,28 +75,28 @@ const RootComponent = () => {
             </button>
 
             {/* Desktop menu */}
-            <div className="hidden md:flex gap-6">
+            <div className="hidden md:flex gap-6 items-center">
               <Link
                 to="/"
-                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold flex items-center"
               >
                 Create a Map
               </Link>
               <Link
                 to="/geocoder"
-                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold flex items-center"
               >
                 Geocoder
               </Link>
               <Link
                 to="/geojson"
-                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold flex items-center"
               >
                 Geojson
               </Link>
               <Link
                 to="/about"
-                className="hover:text-blue-400 transition-colors [&.active]:font-bold"
+                className="hover:text-blue-400 transition-colors [&.active]:font-bold flex items-center"
               >
                 Help & Instructions
               </Link>
