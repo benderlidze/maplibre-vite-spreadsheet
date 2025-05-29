@@ -41,16 +41,18 @@ export const PropertyInspector = ({
   //   console.log("newValue", newValue);
   // };
 
-  const updateKeyValue = (key: string, value: any) => {
-    const updatedGeojson = { ...geojson };
-    if (updatedGeojson && "features" in updatedGeojson) {
-      updatedGeojson.features.forEach(
-        (feature: { properties: { [x: string]: any } }) => {
-          if (feature.properties && key in feature.properties) {
-            feature.properties[key] = value;
-          }
+  const updateKeyValue = (key: string, value: string) => {
+    const updatedGeojson = { ...geojson } as FeatureCollection;
+    if (
+      updatedGeojson &&
+      "features" in updatedGeojson &&
+      Array.isArray(updatedGeojson.features)
+    ) {
+      updatedGeojson.features.forEach((feature: Feature) => {
+        if (feature.properties && key in feature.properties) {
+          feature.properties[key] = value;
         }
-      );
+      });
     }
     onChange(JSON.stringify(updatedGeojson, null, 2));
   };
