@@ -9,7 +9,6 @@ type GeoJsonEditorProps = {
 };
 
 export function GeoJsonEditor({ geojson, onChange }: GeoJsonEditorProps) {
-  console.log("GeoJsonEditor", geojson);
   return (
     <div className="min-h-96 h-full w-full relative">
       <CodeMirror

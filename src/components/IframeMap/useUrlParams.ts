@@ -20,7 +20,6 @@ export const useUrlParams = (): UrlParams => {
 
     // Process each parameter
     searchParams.forEach((value, key) => {
-      console.log("Parsing param:", key, value);
 
       if (key === "pinColor") {
         parsedParams.pinColor = value;

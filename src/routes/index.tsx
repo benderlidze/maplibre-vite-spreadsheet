@@ -39,9 +39,6 @@ function Index() {
     dispatch({ type: "UPDATE_CUSTOM_PROP", prop, value });
   };
 
-  console.log("mapProps", mapProps.dataURL);
-  console.log("mapProps", mapProps);
-
   return (
     <div className="w-full p-6">
       <div className="flex flex-col gap-5 ">
@@ -50,10 +47,10 @@ function Index() {
         <div className="bg-white rounded-lg w-full ">
           <h3 className="text-lg font-medium mb-3">
             1. Add Google Spreadsheet URL{" "}
-            <small className="text-gray-500">
+            {/* <small className="text-gray-500">
               like
               https://docs.google.com/spreadsheets/d/1GkiV0OF9ifo512SYUzbBzjMXnc1eI8puAdEBkdfYKxs
-            </small>
+            </small> */}
           </h3>
 
           <CSVBox

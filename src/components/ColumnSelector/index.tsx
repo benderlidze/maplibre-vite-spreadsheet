@@ -15,9 +15,6 @@ export const ColumnSelector = ({
 }: ColumnSelectorProps) => {
   const [headers, setHeaders] = useState<string[]>(mapProps.csvColumns ?? []);
 
-  console.log("mapProps.csvColumns", mapProps.csvColumns);
-  console.log("headers", headers);
-
   useEffect(() => {
     if (mapProps.csvColumns) {
       setHeaders(mapProps.csvColumns);

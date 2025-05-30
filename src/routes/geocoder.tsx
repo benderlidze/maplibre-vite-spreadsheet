@@ -46,7 +46,6 @@ function RouteComponent() {
       Papa.parse(file, {
         header: true,
         complete: (results) => {
-          console.log("results", results);
           if (
             results.data.length > 0 &&
             typeof results.data[0] === "object" &&

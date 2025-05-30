@@ -36,11 +36,6 @@ export const PropertyInspector = ({
   const featuresWithProperties = useMemo(() => extractProperties(), [geojson]);
   const [filter, setFilter] = useState("");
 
-  // const handleBlur = (e: React.FocusEvent<HTMLTableCellElement>) => {
-  //   const newValue = e.target.innerText;
-  //   console.log("newValue", newValue);
-  // };
-
   const updateKeyValue = (key: string, value: string) => {
     const updatedGeojson = { ...geojson } as FeatureCollection;
     if (
@@ -55,17 +50,6 @@ export const PropertyInspector = ({
       });
     }
     onChange(JSON.stringify(updatedGeojson, null, 2));
-  };
-
-  const handleSave = () => {
-    // if (geojson) {
-    //   onChange(JSON.stringify(geojson, null, 2));
-    // }
-    console.log("geojson", geojson);
-  };
-
-  const handleCancel = () => {
-    console.log("cancel");
   };
 
   return (
@@ -157,7 +141,7 @@ export const PropertyInspector = ({
           </div>
         )}
         <div className="mt-4 flex justify-between space-x-2">
-          <button
+          {/* <button
             onClick={handleSave}
             className="cursor-pointer px-4 py-2 bg-blue-500  text-white rounded-md hover:bg-blue-700 focus:outline-none"
           >
@@ -168,7 +152,7 @@ export const PropertyInspector = ({
             className="cursor-pointer px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none"
           >
             Cancel
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

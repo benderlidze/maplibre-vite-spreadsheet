@@ -26,7 +26,6 @@ export const MapDisplay = ({
   updateCustomProp,
   className,
 }: MapDisplayProps) => {
-  console.log("params", params);
 
   const [mapData, setMapData] = useState<GeoJSON.FeatureCollection | null>(
     null
@@ -143,7 +142,6 @@ export const MapDisplay = ({
               const map = e.target;
               const center = map.getCenter();
               const zoom = map.getZoom().toFixed(2);
-              console.log("Center:", center, "Zoom:", zoom);
 
               updateCustomProp("mapZoom", zoom);
               updateCustomProp("mapCenter", [

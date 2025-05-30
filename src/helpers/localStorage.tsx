@@ -37,7 +37,6 @@ export const loadGeoJSONFromStorage = () => {
 
 export const clearGeoJSONFromStorage = () => {
   try {
-    console.log("Clearing storage...");
     localStorage.removeItem(GEOJSON_STORAGE_KEY);
   } catch (error) {
     console.error("Failed to clear GeoJSON from localStorage:", error);

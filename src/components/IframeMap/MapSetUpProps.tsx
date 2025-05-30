@@ -14,7 +14,6 @@ export const MapSetUpProps = ({
   mapProps,
   updateCustomProp,
 }: MapSetUpProps) => {
-  console.log("mapProps", mapProps);
   const lat = mapProps.mapCenter?.[0] ?? 0;
   const lng = mapProps.mapCenter?.[1] ?? 0;
   const zoom = mapProps.mapZoom ?? 1;

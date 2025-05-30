@@ -174,8 +174,6 @@ export const GmMap: React.FC = () => {
       };
 
       map.on("load", () => {
-        console.log("drawInstance loaded", drawInstance);
-
         const isStorageDataAvailable = checkLocalStorage();
         if (isStorageDataAvailable) {
           //ask if you want to use it with popup
@@ -184,14 +182,12 @@ export const GmMap: React.FC = () => {
           );
           if (useStorage) {
             const savedGeoJSON = loadGeoJSONFromStorage();
-            console.log("savedGeoJSON", savedGeoJSON);
             if (savedGeoJSON && drawInstance.current) {
               // Add features from localStorage to the map
               drawInstance.current.add(savedGeoJSON);
 
               // If there are features, fit the map to their bounds
               if (savedGeoJSON.features && savedGeoJSON.features.length > 0) {
-                console.log("savedGeoJSON.features", savedGeoJSON.features);
                 try {
                   const bounds_ = bbox(savedGeoJSON);
                   setBounds([
@@ -225,18 +221,14 @@ export const GmMap: React.FC = () => {
       map.on("draw.delete", updateGeoJSON);
 
       // Handle selection changes
-      map.on("draw.selectionchange", (e) => {
-        console.log("Selection changed", e);
-
+      map.on("draw.selectionchange", () => {
         if (drawInstance.current) {
           const selectedFeatures = drawInstance.current.getSelectedIds();
-          console.log("Selected feature IDs:", selectedFeatures);
 
           if (selectedFeatures.length > 0) {
             // Get the first selected feature (you can modify this to handle multiple selections)
             const featureData = drawInstance.current.get(selectedFeatures[0]);
             setSelectedGeometry(featureData);
-            console.log("Selected feature data:", featureData);
           } else {
             setSelectedGeometry(null);
           }
@@ -283,9 +275,7 @@ export const GmMap: React.FC = () => {
   }, [currentStyle]);
 
   function updateGeoJSON() {
-    console.log("updateGeoJSON1");
     if (drawInstance.current) {
-      console.log("updateGeoJSON2");
       const allFeatures = drawInstance.current.getAll();
       // setGeoJSON(allFeatures);
       saveGeoJSONToStorage({ data: allFeatures });
@@ -294,7 +284,6 @@ export const GmMap: React.FC = () => {
 
   const onEditorChange = (value: string) => {
     try {
-      console.log("value", value);
       const parsedGeoJSON = JSON.parse(value);
       if (parsedGeoJSON && drawInstance.current) {
         drawInstance.current.set(parsedGeoJSON);
@@ -309,7 +298,6 @@ export const GmMap: React.FC = () => {
   const getGeoJSONData = () => {
     if (drawInstance.current) {
       const allFeatures = drawInstance.current.getAll();
-      console.log("drawInstance.current", drawInstance.current);
       return allFeatures;
     }
     return undefined;
@@ -320,7 +308,6 @@ export const GmMap: React.FC = () => {
   }, [drawInstance.current?.getAll()]);
 
   const handleItemClick = useCallback((itemId: string) => {
-    console.log("item", itemId);
     if (drawInstance.current && itemId) {
       drawInstance.current.changeMode("simple_select" as string, {
         featureIds: [itemId],

@@ -22,7 +22,6 @@ export const MapMenu: React.FC<MapMenuProps> = ({
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
-      console.log("Selected files:", files);
       handleOpenGeoJSONFile(files);
     }
   };
@@ -64,8 +63,6 @@ export const MapMenu: React.FC<MapMenuProps> = ({
       "type" in geojson && geojson.type === "Feature"
         ? { type: "FeatureCollection", features: [geojson as Feature] }
         : (geojson as FeatureCollection);
-
-    console.log("geojson", geojson);
 
     switch (format) {
       case "geojson": {
@@ -153,7 +150,6 @@ export const MapMenu: React.FC<MapMenuProps> = ({
       }
 
       case "shapefile": {
-        console.log("featureCollection", featureCollection);
         try {
           // Optional custom options passed to the underlying `zip` call
           const options = {
